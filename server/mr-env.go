@@ -1,4 +1,4 @@
-package mrenv
+package server
 
 import "os"
 
