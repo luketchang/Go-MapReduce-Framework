@@ -10,7 +10,7 @@ type MapReduceServer struct {
 	host string
 	cwd  string
 
-	listener          *net.Listener //equivalent of serverSocket
+	listener          net.Listener //equivalent of serverSocket
 	verbose           bool
 	mapOnly           bool
 	numMappers        int
@@ -48,6 +48,7 @@ func (s *MapReduceServer) NewServer(args []string) {
 
 	s.parseArgumentList(args)
 	s.nodes = getNodes()
+	s.startServer()
 }
 
 func (s *MapReduceServer) parseArgumentList(args []string) {
@@ -67,9 +68,36 @@ func (s *MapReduceServer) parseArgumentList(args []string) {
 		}
 	}
 
-	fmt.Println("Mapper", s.mapper)
-	fmt.Println("Reducer", s.reducer)
-	fmt.Println("Config", configFileName)
+	fmt.Println("Mapper: ", s.mapper)
+	fmt.Println("Reducer: ", s.reducer)
+	fmt.Println("Config: ", configFileName)
 
 	//TODO: confirmations and checks for executables
+}
+
+func (s *MapReduceServer) startServer() {
+	ln, err := net.Listen("tcp", "127.0.0.1:8000")
+	check(err)
+
+	s.listener = ln
+	go s.orchestrateWorkers()
+}
+
+func (s *MapReduceServer) orchestrateWorkers() {
+	s.serverIsRunning = true
+	for {
+		conn, err := s.listener.Accept()
+		check(err)
+
+		if !s.serverIsRunning {
+			s.listener.Close()
+		}
+
+		fmt.Println("Received connection request from: ", conn.RemoteAddr())
+		s.handleRequest(conn)
+	}
+}
+
+func (s *MapReduceServer) handleRequest(conn net.Conn) {
+	fmt.Println("Handling request...")
 }
