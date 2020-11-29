@@ -16,7 +16,7 @@ var (
 	}
 )
 
-func configServer() *Server {
+func configTestServer() *Server {
 	s := Server{}
 	s.host = GetHost()
 	s.cwd = GetCwd()
@@ -28,7 +28,7 @@ func configServer() *Server {
 }
 
 func TestRequestInput(t *testing.T) {
-	server := configServer()
+	server := configTestServer()
 	server.startServer()
 
 	conn, err := net.Dial("tcp", ServerAddress)

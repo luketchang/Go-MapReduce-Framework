@@ -7,40 +7,40 @@ import (
 	"sync"
 )
 
-type Server struct {
-	host string
-	cwd  string
-
-	listener          net.Listener //equivalent of serverSocket
-	verbose           bool
-	mapOnly           bool
-	numMappers        int
-	numReducers       int
-	mapper            string //from parsed cli argument
-	reducer           string //from parsed cli argument
-	inputPath         string
-	intermediatePath  string
-	outputPath        string
-	mapperExecutable  string //from config file
-	reducerExecutable string //from config file
-
-	nodes           []string
-	ipAddressMap    map[string]string
-	serverIsRunning bool
-	//no way to store thread?
-
-	unprocessed []string
-	inflight    []string
-	fileLock    sync.Mutex
-}
-
 const (
 	mapperFlag  string = "--mapper"
 	reducerFlag string = "--reducer"
 	configFlag  string = "--config"
 )
 
-func (s *Server) Run(args []string) {
+type Server struct {
+	host string
+	cwd  string
+
+	listener          net.Listener
+	verbose           bool
+	mapOnly           bool
+	numMappers        int
+	numReducers       int
+	mapper            string
+	reducer           string
+	inputPath         string
+	intermediatePath  string
+	outputPath        string
+	mapperExecutable  string
+	reducerExecutable string
+
+	nodes           []string
+	ipAddressMap    map[string]string
+	serverIsRunning bool
+
+	unprocessed []string
+	inflight    []string
+	fileLock    sync.Mutex
+}
+
+func NewServer(args []string) *Server {
+	s := Server{}
 	s.host = GetHost()
 	s.cwd = GetCwd()
 	s.verbose = true
@@ -52,6 +52,10 @@ func (s *Server) Run(args []string) {
 		"file3.txt",
 	}
 
+	return &s
+}
+
+func (s *Server) Run(args []string) {
 	s.parseArgumentList(args)
 	s.nodes = getNodes()
 	s.startServer()
