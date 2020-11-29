@@ -8,6 +8,6 @@ import (
 
 func main() {
 	args := os.Args[1:]
-	s := &server.MapReduceServer{}
-	s.NewServer(args)
+	s := &server.Server{}
+	s.Run(args)
 }
