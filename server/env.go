@@ -1,15 +1,22 @@
 package server
 
-import "os"
+import (
+	"log"
+	"os"
+)
 
 func GetHost() string {
 	name, err := os.Hostname()
-	check(err)
+	if err != nil {
+		log.Fatal(errEnvConfig)
+	}
 	return name
 }
 
 func GetCwd() string {
 	path, err := os.Getwd()
-	check(err)
+	if err != nil {
+		log.Fatal(errEnvConfig)
+	}
 	return path
 }

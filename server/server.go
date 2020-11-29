@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"sync"
 )
@@ -68,36 +69,64 @@ func (s *MapReduceServer) parseArgumentList(args []string) {
 		}
 	}
 
+	//TODO: confirmations and checks for executables
 	fmt.Println("Mapper: ", s.mapper)
 	fmt.Println("Reducer: ", s.reducer)
 	fmt.Println("Config: ", configFileName)
-
-	//TODO: confirmations and checks for executables
 }
 
 func (s *MapReduceServer) startServer() {
 	ln, err := net.Listen("tcp", "127.0.0.1:8000")
-	check(err)
+	if err != nil {
+		log.Fatal(errStartingServer)
+	}
 
 	s.listener = ln
-	go s.orchestrateWorkers()
+	s.orchestrateWorkers()
 }
 
 func (s *MapReduceServer) orchestrateWorkers() {
 	s.serverIsRunning = true
 	for {
 		conn, err := s.listener.Accept()
-		check(err)
+		if err != nil {
+			log.Fatal(errBadArgs)
+		}
 
 		if !s.serverIsRunning {
 			s.listener.Close()
 		}
 
-		fmt.Println("Received connection request from: ", conn.RemoteAddr())
+		log.Println("Received connection request from: ", conn.RemoteAddr())
 		s.handleRequest(conn)
 	}
 }
 
 func (s *MapReduceServer) handleRequest(conn net.Conn) {
 	fmt.Println("Handling request...")
+	msg, err := receiveMessage(conn)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Received worker message: ", msg)
+	if msg == WorkerReady {
+		var path string
+		s.getNextFile(&path)
+	}
+}
+
+func (s *MapReduceServer) getNextFile(path *string) bool {
+	if len(s.unprocessed) == 0 {
+		return false
+	}
+
+	s.getAndRemoveFirstFile(path)
+	s.inflight = append(s.inflight, *path)
+	return true
+}
+
+func (s *MapReduceServer) getAndRemoveFirstFile(path *string) {
+	*path = s.unprocessed[0]
+	s.unprocessed = s.unprocessed[1:]
 }
