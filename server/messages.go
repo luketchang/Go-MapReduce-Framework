@@ -26,8 +26,8 @@ var stringToMessageMap = map[string]Message{
 	"SERVER_DONE":   ServerDone,
 }
 
-func receiveMessage(conn net.Conn) Message {
-	msgString := readMessage(conn)
+func receiveWorkerMessage(conn net.Conn) Message {
+	msgString := getMessageString(conn)
 	msg, exists := stringToMessageMap[msgString]
 
 	if !exists {
@@ -36,11 +36,11 @@ func receiveMessage(conn net.Conn) Message {
 	return msg
 }
 
-func readMessage(conn net.Conn) string {
+func getMessageString(conn net.Conn) string {
 	buf := make([]byte, 1024)
 	strLen, err := conn.Read(buf)
 	if err != nil {
-		log.Fatal(errReadingMessage)
+		log.Fatal(MapReduceError{errReadingMessage, err.Error()})
 	}
 	return string(buf[:strLen])
 }
@@ -48,13 +48,14 @@ func readMessage(conn net.Conn) string {
 func (s *Server) sendJobStart(conn net.Conn, path string) {
 	_, err := conn.Write([]byte(path))
 	if err != nil {
-		log.Fatal(errWritingMessage)
+		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
 	}
+	log.Println("Sent message to worker: ", path)
 }
 
 func (s *Server) sendServerDone(conn net.Conn) {
 	_, err := conn.Write([]byte(ServerDone))
 	if err != nil {
-		log.Fatal(errWritingMessage)
+		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
 	}
 }

@@ -1,20 +1,36 @@
 package server
 
 import (
+	"log"
 	"net"
 	"testing"
-	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// func TestServerConnection(t *testing.T) {
-// 	_, err := net.Dial("tcp", ServerAddress)
-// 	if err != nil {
-// 		t.Error("could not connect to server: ", err)
-// 	}
-// 	// defer conn.Close()
-// }
+var (
+	testUnprocessedList = []string{
+		"file1.txt",
+		"file2.txt",
+		"file3.txt",
+	}
+)
 
-func TestReceiveWorkerMessage(t *testing.T) {
+func configServer() *Server {
+	s := Server{}
+	s.host = GetHost()
+	s.cwd = GetCwd()
+	s.verbose = true
+	s.mapOnly = false
+	s.serverIsRunning = false
+	s.unprocessed = testUnprocessedList
+	return &s
+}
+
+func TestRequestInput(t *testing.T) {
+	server := configServer()
+	server.startServer()
+
 	conn, err := net.Dial("tcp", ServerAddress)
 	if err != nil {
 		t.Error("could not connect to server: ", err)
@@ -22,5 +38,7 @@ func TestReceiveWorkerMessage(t *testing.T) {
 	defer conn.Close()
 
 	conn.Write([]byte(WorkerReady))
-	time.Sleep(2 * time.Second)
+	serverMsg := getMessageString(conn)
+	log.Println("Message received from server: ", serverMsg)
+	assert.EqualValues(t, testUnprocessedList[0], serverMsg)
 }

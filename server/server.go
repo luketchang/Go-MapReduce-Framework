@@ -31,7 +31,7 @@ type Server struct {
 
 	unprocessed []string
 	inflight    []string
-	fileLock    *sync.Mutex
+	fileLock    sync.Mutex
 }
 
 const (
@@ -40,17 +40,17 @@ const (
 	configFlag  string = "--config"
 )
 
-func init() {
-	s := Server{}
-	go s.startServer()
-}
-
 func (s *Server) Run(args []string) {
 	s.host = GetHost()
 	s.cwd = GetCwd()
 	s.verbose = true
 	s.mapOnly = false
 	s.serverIsRunning = false
+	s.unprocessed = []string{
+		"file1.txt",
+		"file2.txt",
+		"file3.txt",
+	}
 
 	s.parseArgumentList(args)
 	s.nodes = getNodes()
@@ -83,11 +83,11 @@ func (s *Server) parseArgumentList(args []string) {
 func (s *Server) startServer() {
 	ln, err := net.Listen("tcp", ServerAddress)
 	if err != nil {
-		log.Fatal(errStartingServer)
+		log.Fatal(MapReduceError{errStartingServer, err.Error()})
 	}
 
 	s.listener = ln
-	s.orchestrateWorkers()
+	go s.orchestrateWorkers()
 }
 
 func (s *Server) orchestrateWorkers() {
@@ -95,7 +95,7 @@ func (s *Server) orchestrateWorkers() {
 	for {
 		conn, err := s.listener.Accept()
 		if err != nil {
-			log.Fatal(errBadArgs)
+			log.Fatal(MapReduceError{errCouldNotConnect, err.Error()})
 		}
 		defer conn.Close()
 
@@ -109,8 +109,7 @@ func (s *Server) orchestrateWorkers() {
 }
 
 func (s *Server) handleRequest(conn net.Conn) {
-	fmt.Println("Handling request...")
-	msg := receiveMessage(conn)
+	msg := receiveWorkerMessage(conn)
 
 	log.Println("Received worker message: ", msg)
 	if msg == WorkerReady {
@@ -120,6 +119,13 @@ func (s *Server) handleRequest(conn net.Conn) {
 		s.fileLock.Unlock()
 		if success {
 			s.sendJobStart(conn, path)
+		} else {
+			s.sendServerDone(conn)
 		}
 	}
+}
+
+func (s *Server) shutDown() {
+	s.serverIsRunning = false
+	s.listener.Close()
 }

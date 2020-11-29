@@ -1,15 +1,17 @@
 package server
 
-import (
-	"errors"
-)
+type MapReduceError struct {
+	reason string
+	err    string
+}
 
 var (
-	errStartingServer = errors.New("failed to start server")
-	errBadArgs        = errors.New("bad arguments")
+	errStartingServer  = "failed to start server"
+	errCouldNotConnect = "failed to establish client-server connection"
+	errBadArgs         = "bad arguments"
 
-	errEnvConfig = errors.New("error setting accessing env variables")
+	errEnvConfig = "error setting accessing env variables"
 
-	errReadingMessage = errors.New("could not receive worker message")
-	errWritingMessage = errors.New("could not write message to worker")
+	errReadingMessage = "could not receive worker message"
+	errWritingMessage = "could not write message to worker"
 )
