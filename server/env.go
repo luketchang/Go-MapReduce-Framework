@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+const (
+	ServerAddress string = "127.0.0.1:8000"
+)
+
 func GetHost() string {
 	name, err := os.Hostname()
 	if err != nil {

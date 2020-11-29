@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type MapReduceServer struct {
+type Server struct {
 	host string
 	cwd  string
 
@@ -40,7 +40,12 @@ const (
 	configFlag  string = "--config"
 )
 
-func (s *MapReduceServer) NewServer(args []string) {
+func init() {
+	s := Server{}
+	go s.startServer()
+}
+
+func (s *Server) Run(args []string) {
 	s.host = GetHost()
 	s.cwd = GetCwd()
 	s.verbose = true
@@ -52,7 +57,7 @@ func (s *MapReduceServer) NewServer(args []string) {
 	s.startServer()
 }
 
-func (s *MapReduceServer) parseArgumentList(args []string) {
+func (s *Server) parseArgumentList(args []string) {
 	var configFileName string
 	for i := 0; i < len(args); i++ {
 		ch := args[i]
@@ -75,8 +80,8 @@ func (s *MapReduceServer) parseArgumentList(args []string) {
 	fmt.Println("Config: ", configFileName)
 }
 
-func (s *MapReduceServer) startServer() {
-	ln, err := net.Listen("tcp", "127.0.0.1:8000")
+func (s *Server) startServer() {
+	ln, err := net.Listen("tcp", ServerAddress)
 	if err != nil {
 		log.Fatal(errStartingServer)
 	}
@@ -85,13 +90,14 @@ func (s *MapReduceServer) startServer() {
 	s.orchestrateWorkers()
 }
 
-func (s *MapReduceServer) orchestrateWorkers() {
+func (s *Server) orchestrateWorkers() {
 	s.serverIsRunning = true
 	for {
 		conn, err := s.listener.Accept()
 		if err != nil {
 			log.Fatal(errBadArgs)
 		}
+		defer conn.Close()
 
 		if !s.serverIsRunning {
 			s.listener.Close()
@@ -102,31 +108,18 @@ func (s *MapReduceServer) orchestrateWorkers() {
 	}
 }
 
-func (s *MapReduceServer) handleRequest(conn net.Conn) {
+func (s *Server) handleRequest(conn net.Conn) {
 	fmt.Println("Handling request...")
-	msg, err := receiveMessage(conn)
-	if err != nil {
-		log.Fatal(err)
-	}
+	msg := receiveMessage(conn)
 
 	log.Println("Received worker message: ", msg)
 	if msg == WorkerReady {
 		var path string
-		s.getNextFile(&path)
+		s.fileLock.Lock()
+		success := s.getNextFile(&path)
+		s.fileLock.Unlock()
+		if success {
+			s.sendJobStart(conn, path)
+		}
 	}
-}
-
-func (s *MapReduceServer) getNextFile(path *string) bool {
-	if len(s.unprocessed) == 0 {
-		return false
-	}
-
-	s.getAndRemoveFirstFile(path)
-	s.inflight = append(s.inflight, *path)
-	return true
-}
-
-func (s *MapReduceServer) getAndRemoveFirstFile(path *string) {
-	*path = s.unprocessed[0]
-	s.unprocessed = s.unprocessed[1:]
 }

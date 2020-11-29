@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net"
 )
 
@@ -25,18 +26,35 @@ var stringToMessageMap = map[string]Message{
 	"SERVER_DONE":   ServerDone,
 }
 
-func receiveMessage(conn net.Conn) (Message, error) {
-	buf := make([]byte, 256)
-	_, err := conn.Read(buf)
-	if err != nil {
-		return "", errReadingMesssage
-	}
-
-	str := string(buf)
-	msg, exists := stringToMessageMap[str]
+func receiveMessage(conn net.Conn) Message {
+	msgString := readMessage(conn)
+	msg, exists := stringToMessageMap[msgString]
 
 	if !exists {
-		return UnknownMessage, nil
+		return UnknownMessage
 	}
-	return msg, nil
+	return msg
+}
+
+func readMessage(conn net.Conn) string {
+	buf := make([]byte, 1024)
+	strLen, err := conn.Read(buf)
+	if err != nil {
+		log.Fatal(errReadingMessage)
+	}
+	return string(buf[:strLen])
+}
+
+func (s *Server) sendJobStart(conn net.Conn, path string) {
+	_, err := conn.Write([]byte(path))
+	if err != nil {
+		log.Fatal(errWritingMessage)
+	}
+}
+
+func (s *Server) sendServerDone(conn net.Conn) {
+	_, err := conn.Write([]byte(ServerDone))
+	if err != nil {
+		log.Fatal(errWritingMessage)
+	}
 }

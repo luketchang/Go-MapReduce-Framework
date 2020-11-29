@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"log"
 )
 
 var (
@@ -11,11 +10,6 @@ var (
 
 	errEnvConfig = errors.New("error setting accessing env variables")
 
-	errReadingMesssage = errors.New("could not receive worker message")
+	errReadingMessage = errors.New("could not receive worker message")
+	errWritingMessage = errors.New("could not write message to worker")
 )
-
-func check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
