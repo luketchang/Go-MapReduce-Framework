@@ -117,11 +117,10 @@ func (s *Server) handleRequest(conn net.Conn) {
 
 	log.Println("Received worker message: ", msg)
 	if msg == WorkerReady {
-		var path string
 		s.fileLock.Lock()
-		success := s.getNextFile(&path)
+		path := s.getNextFile()
 		s.fileLock.Unlock()
-		if success {
+		if !isEmpty(path) {
 			s.sendJobStart(conn, path)
 		} else {
 			s.sendServerDone(conn)
