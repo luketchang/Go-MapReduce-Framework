@@ -38,7 +38,7 @@ func TestRequestInput(t *testing.T) {
 	defer conn.Close()
 
 	conn.Write([]byte(WorkerReady))
-	serverMsg := getMessageString(conn)
+	serverMsg := readFromConn(conn)
 	log.Println("Message received from server: ", serverMsg)
 	assert.EqualValues(t, testUnprocessedList[0], serverMsg)
 }

@@ -8,6 +8,6 @@ import (
 
 func main() {
 	args := os.Args[1:]
-	s := server.NewServer(args)
-	s.Run(args)
+	server := server.NewServer(args)
+	server.Run()
 }

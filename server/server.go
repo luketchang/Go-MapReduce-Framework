@@ -52,13 +52,18 @@ func NewServer(args []string) *Server {
 		"file3.txt",
 	}
 
-	return &s
-}
-
-func (s *Server) Run(args []string) {
 	s.parseArgumentList(args)
 	s.nodes = getNodes()
 	s.startServer()
+
+	return &s
+}
+
+func (s *Server) Run() {
+	s.spawnMappers()
+	if !s.mapOnly {
+		s.spawnReducers()
+	}
 }
 
 func (s *Server) parseArgumentList(args []string) {
@@ -90,6 +95,7 @@ func (s *Server) startServer() {
 		log.Fatal(MapReduceError{errStartingServer, err.Error()})
 	}
 
+	log.Println("Server listening on: ", ServerAddress)
 	s.listener = ln
 	go s.orchestrateWorkers()
 }
@@ -113,7 +119,7 @@ func (s *Server) orchestrateWorkers() {
 }
 
 func (s *Server) handleRequest(conn net.Conn) {
-	msg := receiveWorkerMessage(conn)
+	msg := receiveMessage(conn)
 
 	log.Println("Received worker message: ", msg)
 	if msg == WorkerReady {
@@ -125,7 +131,16 @@ func (s *Server) handleRequest(conn net.Conn) {
 		} else {
 			s.sendServerDone(conn)
 		}
+		//TODO: add other message cases after worker code
 	}
+}
+
+func (s *Server) spawnMappers() {
+
+}
+
+func (s *Server) spawnReducers() {
+
 }
 
 func (s *Server) shutDown() {
