@@ -52,7 +52,7 @@ func NewServer(args []string) *Server {
 	}
 
 	s.parseArgumentList(args)
-	s.nodes = getNodes()
+	s.nodes = s.getNodes()
 	s.startServer()
 
 	return &s

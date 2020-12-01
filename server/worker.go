@@ -8,7 +8,7 @@ import (
 type Worker struct{}
 
 func (w *Worker) requestInput() (string, bool) {
-	conn := establishConnection()
+	conn := w.establishConnection()
 	w.sendWorkerReady(conn)
 
 	serverResponse := readFromConn(conn)
@@ -19,7 +19,7 @@ func (w *Worker) requestInput() (string, bool) {
 	return serverResponse, true
 }
 
-func establishConnection() net.Conn {
+func (w *Worker) establishConnection() net.Conn {
 	conn, err := net.Dial("tcp", ServerAddress)
 	if err != nil {
 		log.Fatal(errCouldNotConnect)

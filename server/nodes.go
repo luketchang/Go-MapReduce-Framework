@@ -2,7 +2,7 @@ package server
 
 import "math/rand"
 
-func getNodes() []string {
+func (s *Server) getNodes() []string {
 	return []string{
 		"35.236.94.23",
 	}
