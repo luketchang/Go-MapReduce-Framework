@@ -1,3 +1,3 @@
-package mapreduce
+package reducer
 
 func main() {}

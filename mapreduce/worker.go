@@ -5,9 +5,12 @@ import (
 	"net"
 )
 
-type Worker struct{}
+type Worker struct {
+	Executable string
+	OutputPath string
+}
 
-func (w *Worker) requestInput() (string, bool) {
+func (w *Worker) RequestInput() (string, bool) {
 	conn := w.establishConnection()
 	w.sendWorkerReady(conn)
 

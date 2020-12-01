@@ -148,7 +148,7 @@ func (s *Server) spawnMappers() {
 //SSH: ssh -i ~/.ssh/mr-key Lukes-MacBook-Pro.local@35.236.94.23
 func (s *Server) buildMapperCommand(remoteIPAddr string) string {
 	// sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
-	// executableCommand := strconv.Quote("")
+	// executableCommand := strconv.Quote("mrm")
 	return ""
 }
 
