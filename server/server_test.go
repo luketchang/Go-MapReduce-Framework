@@ -10,26 +10,14 @@ import (
 
 var (
 	testUnprocessedList = []string{
-		"file1.txt",
-		"file2.txt",
-		"file3.txt",
+		"00001.input",
+		"00002.input",
+		"00003.input",
 	}
 )
 
-func configTestServer() *Server {
-	s := Server{}
-	s.host = GetHost()
-	s.cwd = GetCwd()
-	s.verbose = true
-	s.mapOnly = false
-	s.serverIsRunning = false
-	s.unprocessed = testUnprocessedList
-	return &s
-}
-
 func TestRequestInput(t *testing.T) {
-	server := configTestServer()
-	server.startServer()
+	server := NewServer([]string{})
 
 	conn, err := net.Dial("tcp", ServerAddress)
 	if err != nil {
@@ -40,5 +28,5 @@ func TestRequestInput(t *testing.T) {
 	conn.Write([]byte(WorkerReady))
 	serverMsg := readFromConn(conn)
 	log.Println("Message received from server: ", serverMsg)
-	assert.EqualValues(t, testUnprocessedList[0], serverMsg)
+	assert.EqualValues(t, server.inflight[0], serverMsg)
 }

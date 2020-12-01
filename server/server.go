@@ -46,9 +46,9 @@ func NewServer(args []string) *Server {
 	s.mapOnly = false
 	s.serverIsRunning = false
 	s.unprocessed = []string{
-		"file1.txt",
-		"file2.txt",
-		"file3.txt",
+		"00001.input",
+		"00002.input",
+		"00003.input",
 	}
 
 	s.parseArgumentList(args)
@@ -117,9 +117,7 @@ func (s *Server) spawnMappers() {
 	}
 }
 
-func (s *Server) spawnReducers() {
-
-}
+func (s *Server) spawnReducers() {}
 
 func (s *Server) shutDown() {
 	s.serverIsRunning = false

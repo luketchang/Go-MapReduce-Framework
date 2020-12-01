@@ -5,15 +5,7 @@ import (
 	"net"
 )
 
-// type Worker interface {
-// 	requestInput(name *string) bool
-// 	processInput(name string, output string) bool
-// 	notifyServer(name string, success bool)
-// 	alertServerOfProgress(info string)
-// }
-
-type Worker struct {
-}
+type Worker struct{}
 
 func (w *Worker) requestInput() (string, bool) {
 	conn := establishConnection()
