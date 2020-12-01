@@ -6,6 +6,24 @@ import (
 	"path/filepath"
 )
 
+var ConfigFileKeys = []string{
+	"mapper",
+	"reducer",
+	"num-mappers",
+	"num-reducers",
+	"input-path",
+	"intermediate-path",
+	"output-path",
+}
+
+func OpenFile(filePath string) *os.File {
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(MapReduceError{errOpeningFile, err.Error()})
+	}
+	return file
+}
+
 func (s *Server) stageInputFiles() {
 	err := filepath.Walk(s.inputPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {

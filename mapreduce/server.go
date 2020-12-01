@@ -90,6 +90,13 @@ func (s *Server) parseArgumentList(args []string) {
 	fmt.Println("Config: ", configFileName)
 }
 
+func (s *Server) initializeFromConfigFile(configFilePath string) {
+	file := OpenFile(configFilePath)
+	defer file.Close()
+
+	s.parseConfigFile(file)
+}
+
 func (s *Server) startServer() {
 	ln, err := net.Listen("tcp", ServerAddress)
 	if err != nil {
