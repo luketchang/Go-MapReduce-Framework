@@ -41,9 +41,9 @@ func (w *Worker) AlertServerOfProgress(info string) {
 	w.sendJobAlert(conn, info)
 }
 
-func (w *Worker) ProcessInput(inputFilePath string) {
+func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) {
 	fullExecutable := w.getFullExecutablePath()
-	command := w.buildWorkerCommand(fullExecutable, inputFilePath)
+	command := w.buildWorkerCommand(fullExecutable, inputFilePath, outputFilePath)
 	command.Run()
 }
 
@@ -51,7 +51,7 @@ func (w *Worker) getFullExecutablePath() string {
 	return w.Cwd + "/" + w.Executable
 }
 
-func (w *Worker) buildWorkerCommand(executable string, inputFilePath string) *exec.Cmd {
-	commandString := executable + " " + inputFilePath + " " + w.OutputDir
+func (w *Worker) buildWorkerCommand(executable string, inputFilePath string, outputFilePath string) *exec.Cmd {
+	commandString := executable + " " + inputFilePath + " " + outputFilePath
 	return exec.Command(commandString)
 }

@@ -16,6 +16,7 @@ func (m *Mapper) startMappingFiles() {
 		}
 
 		m.AlertServerOfProgress("About to process \"" + inputFilePath + "\".")
-		m.ProcessInput(inputFilePath)
+		outputFilePath := mapreduce.ChangeExtension(inputFilePath, "mapped")
+		m.ProcessInput(inputFilePath, outputFilePath)
 	}
 }
