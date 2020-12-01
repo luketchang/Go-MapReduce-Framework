@@ -3,6 +3,7 @@ package mapreduce
 import (
 	"log"
 	"net"
+	"strings"
 )
 
 type Message string
@@ -37,12 +38,18 @@ var messageToStringMap = map[Message]string{
 
 func receiveMessage(conn net.Conn) Message {
 	msgString := readFromConn(conn)
-	msg, exists := stringToMessageMap[msgString]
+	msg, exists := extractMessageFromString(msgString)
 
 	if !exists {
 		return UnknownMessage
 	}
 	return msg
+}
+
+func extractMessageFromString(msgString string) (Message, bool) {
+	firstWord := strings.Split(msgString, " ")[0]
+	msg, exists := stringToMessageMap[firstWord]
+	return msg, exists
 }
 
 func readFromConn(conn net.Conn) string {
@@ -71,6 +78,13 @@ func (s *Server) sendServerDone(conn net.Conn) {
 
 func (w *Worker) sendWorkerReady(conn net.Conn) {
 	_, err := conn.Write([]byte(WorkerReady))
+	if err != nil {
+		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+	}
+}
+
+func (w *Worker) sendJobAlert(conn net.Conn, info string) {
+	_, err := conn.Write([]byte(messageToStringMap[JobInfo] + " " + info))
 	if err != nil {
 		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
 	}

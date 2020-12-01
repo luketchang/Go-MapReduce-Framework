@@ -1,8 +1,6 @@
 package mapper
 
 import (
-	"fmt"
-
 	"github.com/mapreduce/mapreduce"
 )
 
@@ -12,10 +10,12 @@ type Mapper struct {
 
 func (m *Mapper) startMappingFiles() {
 	for {
-		input, serverDone := m.RequestInput()
+		inputFilePath, serverDone := m.RequestInput()
 		if serverDone {
 			break
 		}
-		fmt.Println("Mapper started...")
+
+		m.AlertServerOfProgress("About to process \"" + inputFilePath + "\".")
+		m.ProcessInput(inputFilePath)
 	}
 }
