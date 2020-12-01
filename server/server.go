@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"sync"
@@ -66,29 +65,6 @@ func (s *Server) Run() {
 	}
 }
 
-func (s *Server) parseArgumentList(args []string) {
-	var configFileName string
-	for i := 0; i < len(args); i++ {
-		ch := args[i]
-
-		//TODO: convert to using getopt package + error checking
-		if ch == mapperFlag {
-			s.mapper = args[i+1]
-		}
-		if ch == reducerFlag {
-			s.reducer = args[i+1]
-		}
-		if ch == configFlag {
-			configFileName = args[i+1]
-		}
-	}
-
-	//TODO: confirmations and checks for executables
-	fmt.Println("Mapper: ", s.mapper)
-	fmt.Println("Reducer: ", s.reducer)
-	fmt.Println("Config: ", configFileName)
-}
-
 func (s *Server) startServer() {
 	ln, err := net.Listen("tcp", ServerAddress)
 	if err != nil {
@@ -112,7 +88,6 @@ func (s *Server) orchestrateWorkers() {
 		if !s.serverIsRunning {
 			s.listener.Close()
 		}
-
 		log.Println("Received connection request from: ", conn.RemoteAddr())
 		s.handleRequest(conn)
 	}
@@ -136,7 +111,10 @@ func (s *Server) handleRequest(conn net.Conn) {
 }
 
 func (s *Server) spawnMappers() {
-
+	s.stageInputFiles()
+	for i := 0; i < s.numMappers; i++ {
+		// mapperNode := s.getRandomNode()
+	}
 }
 
 func (s *Server) spawnReducers() {

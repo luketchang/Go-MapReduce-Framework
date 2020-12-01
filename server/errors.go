@@ -9,6 +9,7 @@ var (
 	errStartingServer  = "failed to start server"
 	errCouldNotConnect = "failed to establish client-server connection"
 	errBadArgs         = "bad arguments"
+	errReadingInputDir = "error reading input directory files"
 
 	errEnvConfig = "error setting accessing env variables"
 

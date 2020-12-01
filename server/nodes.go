@@ -1,10 +1,14 @@
 package server
 
+import "math/rand"
+
 func getNodes() []string {
 	return []string{
-		"machine 1",
-		"machine 2",
-		"machine 3",
-		"machine 4",
+		"35.236.94.23",
 	}
+}
+
+func (s *Server) getRandomNode() string {
+	randIndex := rand.Intn(len(s.nodes))
+	return s.nodes[randIndex]
 }
