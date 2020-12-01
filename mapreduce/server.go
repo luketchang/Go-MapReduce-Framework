@@ -1,12 +1,14 @@
-package server
+package mapreduce
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"sync"
 )
 
 const (
+	sshKeyPath  string = "~/.ssh/mr-key"
 	mapperFlag  string = "--mapper"
 	reducerFlag string = "--reducer"
 	configFlag  string = "--config"
@@ -21,13 +23,13 @@ type Server struct {
 	mapOnly           bool
 	numMappers        int
 	numReducers       int
-	mapper            string
-	reducer           string
+	mapper            string //mr executable
+	reducer           string //mrm executable
 	inputPath         string
 	intermediatePath  string
 	outputPath        string
-	mapperExecutable  string
-	reducerExecutable string
+	mapperExecutable  string //wordcount-mapper
+	reducerExecutable string //wordcount-reducer
 
 	nodes           []string
 	ipAddressMap    map[string]string
@@ -63,6 +65,29 @@ func (s *Server) Run() {
 	if !s.mapOnly {
 		s.spawnReducers()
 	}
+}
+
+func (s *Server) parseArgumentList(args []string) {
+	var configFileName string
+	for i := 0; i < len(args); i++ {
+		ch := args[i]
+
+		//TODO: convert to using getopt package + error checking
+		if ch == mapperFlag {
+			s.mapper = args[i+1]
+		}
+		if ch == reducerFlag {
+			s.reducer = args[i+1]
+		}
+		if ch == configFlag {
+			configFileName = args[i+1]
+		}
+	}
+
+	//TODO: confirmations and checks for executables
+	fmt.Println("Mapper: ", s.mapper)
+	fmt.Println("Reducer: ", s.reducer)
+	fmt.Println("Config: ", configFileName)
 }
 
 func (s *Server) startServer() {
@@ -110,11 +135,21 @@ func (s *Server) handleRequest(conn net.Conn) {
 	}
 }
 
+//SCP: scp -r -i ~/.ssh/mr-key ./input/ Lukes-MacBook-Pro.local@35.236.94.23:~/input
+func (s *Server) sendInputFilesToVMs() {}
+
 func (s *Server) spawnMappers() {
 	s.stageInputFiles()
 	for i := 0; i < s.numMappers; i++ {
 		// mapperNode := s.getRandomNode()
 	}
+}
+
+//SSH: ssh -i ~/.ssh/mr-key Lukes-MacBook-Pro.local@35.236.94.23
+func (s *Server) buildMapperCommand(remoteIPAddr string) string {
+	// sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
+	// executableCommand := strconv.Quote("")
+	return ""
 }
 
 func (s *Server) spawnReducers() {}

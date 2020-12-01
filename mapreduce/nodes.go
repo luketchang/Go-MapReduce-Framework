@@ -1,4 +1,4 @@
-package server
+package mapreduce
 
 import "math/rand"
 

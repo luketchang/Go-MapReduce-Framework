@@ -1,4 +1,4 @@
-package server
+package mapreduce
 
 type MapReduceError struct {
 	reason string

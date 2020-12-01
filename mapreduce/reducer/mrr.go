@@ -1,0 +1,3 @@
+package mapreduce
+
+func main() {}
