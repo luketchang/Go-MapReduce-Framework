@@ -1,8 +1,11 @@
 package mapreduce
 
 import (
+	"fmt"
 	"log"
 	"net"
+	"os/exec"
+	"strconv"
 	"sync"
 )
 
@@ -116,16 +119,28 @@ func (s *Server) sendInputFilesToVMs() {}
 
 func (s *Server) spawnMappers() {
 	s.stageInputFiles()
+
+	var wg sync.WaitGroup
+	wg.Add(s.numMappers)
 	for i := 0; i < s.numMappers; i++ {
-		// mapperNode := s.getRandomNode()
+		mapperNodeIP := s.getRandomNode()
+		command := s.buildMapperCommand(mapperNodeIP)
+		go s.spawnWorker(command, &wg)
 	}
+	wg.Wait()
 }
 
 //SSH: ssh -i ~/.ssh/mr-key Lukes-MacBook-Pro.local@35.236.94.23
-func (s *Server) buildMapperCommand(remoteIPAddr string) string {
-	// sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
-	// executableCommand := strconv.Quote("mrm")
-	return ""
+func (s *Server) buildMapperCommand(remoteIPAddr string) *exec.Cmd {
+	sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
+	executableCommand := strconv.Quote("mrm")
+	combinedCommand := exec.Command(sshCommand + executableCommand)
+	return combinedCommand
+}
+
+func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
+	command.Run()
+	wg.Done()
 }
 
 func (s *Server) spawnReducers() {}

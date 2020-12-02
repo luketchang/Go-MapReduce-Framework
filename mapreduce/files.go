@@ -19,7 +19,7 @@ var ConfigFileKeys = []string{
 func OpenFile(filePath string) *os.File {
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal(MapReduceError{errOpeningFile, err.Error()})
+		log.Fatal(MapReduceError{errOpeningFile, filePath})
 	}
 	return file
 }
