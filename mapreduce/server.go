@@ -69,12 +69,12 @@ func (s *Server) Run() {
 }
 
 func (s *Server) startServer() {
-	ln, err := net.Listen("tcp", ServerAddress)
+	ln, err := net.Listen("tcp", ExternalServerAddress)
 	if err != nil {
 		log.Fatal(MapReduceError{errStartingServer, err.Error()})
 	}
 
-	log.Println("Server listening on: ", ServerAddress)
+	log.Println("Server listening on: ", ExternalServerAddress)
 	s.listener = ln
 	go s.orchestrateWorkers()
 }
@@ -124,17 +124,17 @@ func (s *Server) spawnMappers() {
 	for i := 0; i < s.numMappers; i++ {
 		mapperNodeIP := s.getRandomNode()
 		command := s.buildMapperCommand(mapperNodeIP)
-		log.Println("Starting command", command, "on remote command on machine:", mapperNodeIP)
+		log.Println("Starting command [", command, "] on remote command on machine:", mapperNodeIP)
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
 }
 
-//SSH: ssh -i ~/.ssh/mr-key Lukes-MacBook-Pro.local@35.236.94.23
 func (s *Server) buildMapperCommand(remoteIPAddr string) *exec.Cmd {
-	sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
-	combinedCommand := exec.Command(sshCommand + " '" + s.mapper + " " + s.mapperExecutable + " " + s.outputPath + "'")
-	return combinedCommand
+	login := fmt.Sprintf("%s@%s", s.host, remoteIPAddr)
+	executable := fmt.Sprintf("'%s %s %s'", s.mapper, s.mapperExecutable, s.outputPath)
+	command := exec.Command("ssh", "-i", sshKeyPath, login, executable)
+	return command
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {

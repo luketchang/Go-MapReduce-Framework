@@ -27,7 +27,7 @@ func TestRequestInput(t *testing.T) {
 		"files/example.cfg",
 	})
 
-	conn, err := net.Dial("tcp", ServerAddress)
+	conn, err := net.Dial("tcp", InternalServerAddress)
 	if err != nil {
 		t.Error("could not connect to server: ", err)
 	}
