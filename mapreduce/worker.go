@@ -27,7 +27,7 @@ func (w *Worker) RequestInput() (string, bool) {
 func (w *Worker) establishConnection() net.Conn {
 	conn, err := net.Dial("tcp", ServerAddress)
 	if err != nil {
-		log.Fatal(errCouldNotConnect)
+		log.Fatal(MapReduceError{errCouldNotConnect, err.Error()})
 	}
 	return conn
 }

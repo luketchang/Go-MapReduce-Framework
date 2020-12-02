@@ -1,4 +1,4 @@
-package mrm
+package main
 
 import (
 	"os"
@@ -7,9 +7,9 @@ import (
 	"github.com/mapreduce/mapreduce/mapper"
 )
 
-func main() bool {
+func main() {
 	if !hasTwoArgs() {
-		return false
+		return
 	}
 
 	executable := os.Args[1]
@@ -23,9 +23,8 @@ func main() bool {
 	}
 
 	mapper.StartMappingFiles()
-	return true
 }
 
 func hasTwoArgs() bool {
-	return len(os.Args[1:]) != 2
+	return len(os.Args[1:]) == 2
 }

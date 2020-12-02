@@ -5,7 +5,6 @@ import (
 	"log"
 	"net"
 	"os/exec"
-	"strconv"
 	"sync"
 )
 
@@ -125,7 +124,7 @@ func (s *Server) spawnMappers() {
 	for i := 0; i < s.numMappers; i++ {
 		mapperNodeIP := s.getRandomNode()
 		command := s.buildMapperCommand(mapperNodeIP)
-		log.Println("Starting remote command on machine %s:", mapperNodeIP)
+		log.Println("Starting command", command, "on remote command on machine:", mapperNodeIP)
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
@@ -134,13 +133,15 @@ func (s *Server) spawnMappers() {
 //SSH: ssh -i ~/.ssh/mr-key Lukes-MacBook-Pro.local@35.236.94.23
 func (s *Server) buildMapperCommand(remoteIPAddr string) *exec.Cmd {
 	sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
-	executableCommand := strconv.Quote(s.mapper)
-	combinedCommand := exec.Command(sshCommand + " " + executableCommand)
+	combinedCommand := exec.Command(sshCommand + " '" + s.mapper + " " + s.mapperExecutable + " " + s.outputPath + "'")
 	return combinedCommand
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
-	command.Run()
+	err := command.Run()
+	if err != nil {
+		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
+	}
 	wg.Done()
 }
 

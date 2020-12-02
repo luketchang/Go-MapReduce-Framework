@@ -1,6 +1,8 @@
 package mapper
 
 import (
+	"log"
+
 	"github.com/mapreduce/mapreduce"
 )
 
@@ -11,6 +13,7 @@ type Mapper struct {
 func (m *Mapper) StartMappingFiles() {
 	for {
 		inputFilePath, serverDone := m.RequestInput()
+		log.Println(inputFilePath, serverDone)
 		if serverDone {
 			break
 		}

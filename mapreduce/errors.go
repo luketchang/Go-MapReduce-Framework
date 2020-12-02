@@ -9,6 +9,7 @@ var (
 	errStartingServer  = "failed to start server,"
 	errCouldNotConnect = "failed to establish client-server connection,"
 	errBadArgs         = "bad arguments,"
+
 	errReadingInputDir = "error reading input directory files,"
 	errOpeningFile     = "error opening file,"
 	errScanningFile    = "error scanning file,"
@@ -19,4 +20,6 @@ var (
 	errWritingMessage = "could not write message to worker,"
 
 	errBadConfigFile = "incorrect configuration file formatting,"
+
+	errExecutingCmd = "failed to execute command on remote machine,"
 )
