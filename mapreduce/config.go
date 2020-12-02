@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+func (s *Server) initializeFromConfigFile(configFilePath string) {
+	file := OpenFile(configFilePath)
+	defer file.Close()
+	s.parseConfigFile(file)
+}
+
 func (s *Server) parseConfigFile(file *os.File) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {

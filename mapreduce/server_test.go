@@ -17,7 +17,15 @@ var (
 )
 
 func TestRequestInput(t *testing.T) {
-	server := NewServer([]string{})
+	server := NewServer([]string{
+		"mr",
+		"--mapper",
+		"./mapper/mrm",
+		"--reducer",
+		"./reducer/mrr",
+		"--config",
+		"files/example.cfg",
+	})
 
 	conn, err := net.Dial("tcp", ServerAddress)
 	if err != nil {
