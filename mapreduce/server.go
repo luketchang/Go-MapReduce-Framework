@@ -115,7 +115,7 @@ func (s *Server) handleRequest(conn net.Conn) {
 }
 
 //SCP: scp -r -i ~/.ssh/mr-key ./input/ Lukes-MacBook-Pro.local@35.236.94.23:~/input
-func (s *Server) sendInputFilesToVMs() {}
+func (s *Server) copyFilesToVMs() {}
 
 func (s *Server) spawnMappers() {
 	s.stageInputFiles()
@@ -125,6 +125,7 @@ func (s *Server) spawnMappers() {
 	for i := 0; i < s.numMappers; i++ {
 		mapperNodeIP := s.getRandomNode()
 		command := s.buildMapperCommand(mapperNodeIP)
+		log.Println("Starting remote command on machine %s:", mapperNodeIP)
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
@@ -133,8 +134,8 @@ func (s *Server) spawnMappers() {
 //SSH: ssh -i ~/.ssh/mr-key Lukes-MacBook-Pro.local@35.236.94.23
 func (s *Server) buildMapperCommand(remoteIPAddr string) *exec.Cmd {
 	sshCommand := fmt.Sprintf("ssh -i %s %s@%s", sshKeyPath, s.host, remoteIPAddr)
-	executableCommand := strconv.Quote("mrm")
-	combinedCommand := exec.Command(sshCommand + executableCommand)
+	executableCommand := strconv.Quote(s.mapper)
+	combinedCommand := exec.Command(sshCommand + " " + executableCommand)
 	return combinedCommand
 }
 
