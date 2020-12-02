@@ -8,7 +8,7 @@ type Mapper struct {
 	mapreduce.Worker
 }
 
-func (m *Mapper) startMappingFiles() {
+func (m *Mapper) StartMappingFiles() {
 	for {
 		inputFilePath, serverDone := m.RequestInput()
 		if serverDone {

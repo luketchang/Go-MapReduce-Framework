@@ -1,9 +1,10 @@
-package mapper
+package mrm
 
 import (
 	"os"
 
 	"github.com/mapreduce/mapreduce"
+	"github.com/mapreduce/mapreduce/mapper"
 )
 
 func main() bool {
@@ -14,14 +15,14 @@ func main() bool {
 	executable := os.Args[1]
 	outputDir := os.Args[2]
 
-	mapper := Mapper{
+	mapper := mapper.Mapper{
 		mapreduce.Worker{
 			Executable: executable,
 			OutputDir:  outputDir,
 		},
 	}
 
-	mapper.startMappingFiles()
+	mapper.StartMappingFiles()
 	return true
 }
 
