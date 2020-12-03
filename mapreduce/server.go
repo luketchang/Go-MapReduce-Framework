@@ -69,7 +69,7 @@ func (s *Server) Run() {
 }
 
 func (s *Server) startServer() {
-	ln, err := net.Listen("tcp", ExternalServerAddress)
+	ln, err := net.Listen("tcp", InternalServerAddress)
 	if err != nil {
 		log.Fatal(MapReduceError{errStartingServer, err.Error()})
 	}
@@ -113,27 +113,24 @@ func (s *Server) handleRequest(conn net.Conn) {
 	}
 }
 
-//SCP: scp -r -i ~/.ssh/mr-key ./input/ Lukes-MacBook-Pro.local@35.236.94.23:~/input
-func (s *Server) copyFilesToVMs() {}
-
 func (s *Server) spawnMappers() {
 	s.stageInputFiles()
 
 	var wg sync.WaitGroup
 	wg.Add(s.numMappers)
 	for i := 0; i < s.numMappers; i++ {
-		mapperNodeIP := s.getRandomNode()
-		command := s.buildMapperCommand(mapperNodeIP)
-		log.Println("Starting command [", command, "] on remote command on machine:", mapperNodeIP)
+		mapperNode := s.getRandomNode()
+		command := s.buildMapperCommand(mapperNode)
+		log.Println("Starting command [", command, "] on remote command on machine:", mapperNode)
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
 }
 
-func (s *Server) buildMapperCommand(remoteIPAddr string) *exec.Cmd {
-	login := fmt.Sprintf("%s@%s", s.host, remoteIPAddr)
-	executable := fmt.Sprintf("'%s %s %s'", s.mapper, s.mapperExecutable, s.outputPath)
-	command := exec.Command("ssh", "-i", sshKeyPath, login, executable)
+func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
+	commandFlag := fmt.Sprintf("--command='%s %s %s'", s.mapper, s.mapperExecutable, s.outputPath)
+	zoneFlag := fmt.Sprintf("--zone=%s", ServerZone)
+	command := exec.Command("gcloud", "compute", "ssh", remoteMachine, commandFlag, zoneFlag)
 	return command
 }
 

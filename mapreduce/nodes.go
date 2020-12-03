@@ -4,7 +4,8 @@ import "math/rand"
 
 func (s *Server) getNodes() []string {
 	return []string{
-		"35.236.94.23",
+		"mapper-1",
+		"mapper-2",
 	}
 }
 

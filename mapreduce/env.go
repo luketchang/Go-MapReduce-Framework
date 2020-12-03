@@ -7,7 +7,8 @@ import (
 
 const (
 	InternalServerAddress string = "127.0.0.1:8000"
-	ExternalServerAddress string = "35.235.118.114:8000"
+	ExternalServerAddress string = "34.94.186.201:8000"
+	ServerZone            string = "us-west2-a"
 )
 
 func GetHost() string {
