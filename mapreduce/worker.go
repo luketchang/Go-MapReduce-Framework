@@ -18,10 +18,10 @@ func (w *Worker) RequestInput() (string, bool) {
 
 	serverResponse := readFromConn(conn)
 	if isServerDoneMsg(serverResponse) {
-		return "", false
+		return "", true
 	}
 
-	return serverResponse, true
+	return serverResponse, false
 }
 
 func (w *Worker) establishConnection() net.Conn {
@@ -54,6 +54,5 @@ func (w *Worker) getFullExecutablePath() string {
 }
 
 func (w *Worker) buildWorkerCommand(executable string, inputFilePath string, outputFilePath string) *exec.Cmd {
-	commandString := executable + " " + inputFilePath + " " + outputFilePath
-	return exec.Command(commandString)
+	return exec.Command(executable, inputFilePath, outputFilePath)
 }
