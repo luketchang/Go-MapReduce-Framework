@@ -74,7 +74,7 @@ func (s *Server) startServer() {
 		log.Fatal(MapReduceError{errStartingServer, err.Error()})
 	}
 
-	log.Println("Server listening on: ", ExternalServerAddress)
+	log.Println("Server listening on (outside): ", ExternalServerAddress)
 	s.listener = ln
 	go s.orchestrateWorkers()
 }
@@ -124,21 +124,26 @@ func (s *Server) spawnMappers() {
 		log.Println("Starting command [", command, "] on remote command on machine:", mapperNode)
 		go s.spawnWorker(command, &wg)
 	}
+	log.Println("Waiting for mappers to finish...")
 	wg.Wait()
+	log.Println("Mappers done.")
 }
 
 func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
-	commandFlag := fmt.Sprintf("--command='%s %s %s'", s.mapper, s.mapperExecutable, s.outputPath)
+	commandFlag := fmt.Sprintf("--command=%s %s %s", s.mapper, s.mapperExecutable, s.outputPath)
+	// commandFlag := fmt.Sprintf("--command=\"ls\"")
 	zoneFlag := fmt.Sprintf("--zone=%s", ServerZone)
-	command := exec.Command("gcloud", "compute", "ssh", remoteMachine, commandFlag, zoneFlag)
+	command := exec.Command("gcloud", "compute", "ssh", remoteMachine, zoneFlag, commandFlag)
 	return command
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
-	err := command.Run()
+	err := command.Start()
 	if err != nil {
 		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
 	}
+	err = command.Wait()
+	log.Println("Command finished with error:", err)
 	wg.Done()
 }
 

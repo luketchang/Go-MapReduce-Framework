@@ -29,6 +29,8 @@ func (w *Worker) establishConnection() net.Conn {
 	if err != nil {
 		log.Fatal(MapReduceError{errCouldNotConnect, err.Error()})
 	}
+
+	log.Println("Worker connected to server!")
 	return conn
 }
 
