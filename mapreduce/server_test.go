@@ -1,40 +1,49 @@
 package mapreduce
 
 import (
-	"log"
 	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	testUnprocessedList = []string{
-		"00001.input",
-		"00002.input",
-		"00003.input",
-	}
-)
+func TestRequestInputWorkerReady(t *testing.T) {
+	s := Server{}
+	s.address = ":8001"
+	s.unprocessed = []string{
+		"test_files/input/00001.input",
+		"test_files/input/00002.input",
+		"test_files/input/00003.input"}
+	s.startServer()
 
-func TestRequestInput(t *testing.T) {
-	server := NewServer([]string{
-		"mr",
-		"--mapper",
-		"./mapper/mrm",
-		"--reducer",
-		"./reducer/mrr",
-		"--config",
-		"files/example.cfg",
-	})
-
-	conn, err := net.Dial("tcp", InternalServerAddress)
+	conn, err := net.Dial("tcp", "127.0.0.1:8001")
 	if err != nil {
 		t.Error("could not connect to server: ", err)
 	}
 	defer conn.Close()
 
-	conn.Write([]byte(WorkerReady))
+	w := Worker{}
+	w.sendWorkerReady(conn)
 	serverMsg := readFromConn(conn)
-	log.Println("Message received from server: ", serverMsg)
-	assert.EqualValues(t, server.inflight[0], serverMsg)
+	assert.EqualValues(t, s.inflight[0], serverMsg)
+}
+
+func TestRequestInputNoMoreFiles(t *testing.T) {
+	s := Server{}
+	s.address = ":8002"
+	s.unprocessed = []string{}
+	s.startServer()
+
+	s.unprocessed = []string{}
+
+	conn, err := net.Dial("tcp", "127.0.0.1:8002")
+	if err != nil {
+		t.Error("could not connect to server: ", err)
+	}
+	defer conn.Close()
+
+	w := Worker{}
+	w.sendWorkerReady(conn)
+	serverMsg := readFromConn(conn)
+	assert.EqualValues(t, serverMsg, ServerDone)
 }

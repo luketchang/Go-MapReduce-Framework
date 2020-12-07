@@ -16,8 +16,9 @@ const (
 )
 
 type Server struct {
-	host string
-	cwd  string
+	address string
+	host    string
+	cwd     string
 
 	listener          net.Listener
 	verbose           bool
@@ -48,13 +49,10 @@ func NewServer(args []string) *Server {
 	s.verbose = true
 	s.mapOnly = false
 	s.serverIsRunning = false
-	s.unprocessed = []string{
-		"00001.input",
-		"00002.input",
-		"00003.input",
-	}
+	s.address = ":8000"
 
 	s.parseArgumentList(args)
+	s.stageInputFiles()
 	s.nodes = s.getNodes()
 	s.startServer()
 
@@ -69,12 +67,12 @@ func (s *Server) Run() {
 }
 
 func (s *Server) startServer() {
-	ln, err := net.Listen("tcp", InternalServerAddress)
+	ln, err := net.Listen("tcp", s.address)
 	if err != nil {
 		log.Fatal(MapReduceError{errStartingServer, err.Error()})
 	}
 
-	log.Println("Server listening on (outside): ", ExternalServerAddress)
+	log.Println("Server listening on: ", ExternalServerAddress)
 	s.listener = ln
 	go s.orchestrateWorkers()
 }
@@ -97,9 +95,10 @@ func (s *Server) orchestrateWorkers() {
 }
 
 func (s *Server) handleRequest(conn net.Conn) {
-	msg := receiveMessage(conn)
+	msgString := readFromConn(conn)
+	msg := extractMessageFromString(msgString)
 
-	log.Println("Received worker message: ", msg)
+	log.Println("Received worker message: ", msgString)
 	if msg == WorkerReady {
 		s.fileLock.Lock()
 		path := s.getNextFile()
@@ -114,8 +113,6 @@ func (s *Server) handleRequest(conn net.Conn) {
 }
 
 func (s *Server) spawnMappers() {
-	s.stageInputFiles()
-
 	var wg sync.WaitGroup
 	wg.Add(s.numMappers)
 	for i := 0; i < s.numMappers; i++ {
@@ -124,7 +121,6 @@ func (s *Server) spawnMappers() {
 		log.Println("Starting command [", command, "] on remote command on machine:", mapperNode)
 		go s.spawnWorker(command, &wg)
 	}
-	log.Println("Waiting for mappers to finish...")
 	wg.Wait()
 	log.Println("Mappers done.")
 }

@@ -1,6 +1,10 @@
 package mapreduce
 
-import "math/rand"
+import (
+	"math"
+	"math/rand"
+	"time"
+)
 
 func (s *Server) getNodes() []string {
 	return []string{
@@ -10,6 +14,12 @@ func (s *Server) getNodes() []string {
 }
 
 func (s *Server) getRandomNode() string {
-	randIndex := rand.Intn(len(s.nodes))
+	randIndex := zeroInclusiveRand(len(s.nodes))
 	return s.nodes[randIndex]
+}
+
+func zeroInclusiveRand(max int) int {
+	time.Sleep(1 * time.Second)
+	rand.Seed(time.Now().Unix())
+	return int(math.Floor(rand.Float64() * float64(max)))
 }

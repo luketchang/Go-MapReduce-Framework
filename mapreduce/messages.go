@@ -36,20 +36,13 @@ var messageToStringMap = map[Message]string{
 	ServerDone:   "SERVER_DONE",
 }
 
-func receiveMessage(conn net.Conn) Message {
-	msgString := readFromConn(conn)
-	msg, exists := extractMessageFromString(msgString)
-
+func extractMessageFromString(msgString string) Message {
+	firstWord := strings.Split(msgString, " ")[0]
+	msg, exists := stringToMessageMap[firstWord]
 	if !exists {
 		return UnknownMessage
 	}
 	return msg
-}
-
-func extractMessageFromString(msgString string) (Message, bool) {
-	firstWord := strings.Split(msgString, " ")[0]
-	msg, exists := stringToMessageMap[firstWord]
-	return msg, exists
 }
 
 func readFromConn(conn net.Conn) string {
