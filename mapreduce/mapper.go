@@ -1,14 +1,12 @@
-package mapper
+package mapreduce
 
 import (
 	"fmt"
 	"log"
-
-	"github.com/mapreduce/mapreduce"
 )
 
 type Mapper struct {
-	mapreduce.Worker
+	Worker
 }
 
 func (m *Mapper) StartMappingFiles() {
@@ -21,7 +19,6 @@ func (m *Mapper) StartMappingFiles() {
 		}
 
 		m.AlertServerOfProgress("About to process \"" + inputFilePath + "\".")
-		outputFilePath := mapreduce.ChangeExtension(inputFilePath, "mapped")
-		m.ProcessInput(inputFilePath, outputFilePath)
+		m.ProcessInput(inputFilePath, m.OutputDir)
 	}
 }

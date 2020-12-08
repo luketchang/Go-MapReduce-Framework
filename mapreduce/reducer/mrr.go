@@ -1,3 +1,0 @@
-package reducer
-
-func main() {}

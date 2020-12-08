@@ -4,18 +4,17 @@ import (
 	"os"
 
 	"github.com/mapreduce/mapreduce"
-	"github.com/mapreduce/mapreduce/mapper"
 )
 
 func main() {
-	if !hasTwoArgs() {
+	if len(os.Args[1:]) != 2 {
 		return
 	}
 
 	executable := os.Args[1]
 	outputDir := os.Args[2]
 
-	mapper := mapper.Mapper{
+	mapper := mapreduce.Mapper{
 		mapreduce.Worker{
 			Executable: executable,
 			OutputDir:  outputDir,
@@ -23,8 +22,4 @@ func main() {
 	}
 
 	mapper.StartMappingFiles()
-}
-
-func hasTwoArgs() bool {
-	return len(os.Args[1:]) == 2
 }

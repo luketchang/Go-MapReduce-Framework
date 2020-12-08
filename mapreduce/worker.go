@@ -7,7 +7,6 @@ import (
 )
 
 type Worker struct {
-	Cwd        string
 	Executable string
 	OutputDir  string
 }
@@ -44,15 +43,14 @@ func (w *Worker) AlertServerOfProgress(info string) {
 }
 
 func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) {
-	fullExecutable := w.getFullExecutablePath()
-	command := w.buildWorkerCommand(fullExecutable, inputFilePath, outputFilePath)
-	command.Run()
-}
-
-func (w *Worker) getFullExecutablePath() string {
-	return w.Cwd + "/" + w.Executable
+	command := w.buildWorkerCommand(w.Executable, inputFilePath, outputFilePath)
+	err := command.Run()
+	if err != nil {
+		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
+	}
+	log.Println("Command finished with error:", err)
 }
 
 func (w *Worker) buildWorkerCommand(executable string, inputFilePath string, outputFilePath string) *exec.Cmd {
-	return exec.Command(executable, inputFilePath, outputFilePath)
+	return exec.Command("sudo", executable, inputFilePath, outputFilePath)
 }
