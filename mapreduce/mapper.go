@@ -18,7 +18,7 @@ func (m *Mapper) StartMappingFiles() {
 			break
 		}
 
-		m.AlertServerOfProgress("About to process \"" + inputFilePath + "\".")
+		m.AlertServerOfProgress("About to map \"" + inputFilePath + "\".")
 		m.ProcessInput(inputFilePath)
 	}
 }
