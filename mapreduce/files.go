@@ -16,16 +16,8 @@ var ConfigFileKeys = []string{
 	"output-path",
 }
 
-func OpenFile(filePath string) *os.File {
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Fatal(MapReduceError{errOpeningFile, filePath})
-	}
-	return file
-}
-
 func (s *Server) stageInputFiles() {
-	err := filepath.Walk(s.inputPath, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(s.inputDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			s.unprocessed = append(s.unprocessed, path)
 		}

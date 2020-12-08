@@ -9,8 +9,12 @@ import (
 )
 
 func (s *Server) initializeFromConfigFile(configFilePath string) {
-	file := OpenFile(configFilePath)
+	file, err := os.Open(configFilePath)
+	if err != nil {
+		log.Fatal(MapReduceError{errOpeningFile, configFilePath})
+	}
 	defer file.Close()
+
 	s.parseConfigFile(file)
 }
 
@@ -19,7 +23,7 @@ func (s *Server) parseConfigFile(file *os.File) {
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		key := strings.Split(line, " ")[0]
-		if !Contains(ConfigFileKeys, key) {
+		if !Contains(key, ConfigFileKeys) {
 			log.Fatal(MapReduceError{errBadConfigFile, "non-existent config key"})
 		}
 
@@ -43,11 +47,11 @@ func (s *Server) applyConfigLineToServer(key string, value string) {
 	} else if key == "num-reducers" {
 		s.numReducers = parseInt(value)
 	} else if key == "input-path" {
-		s.inputPath = value
+		s.inputDir = value
 	} else if key == "intermediate-path" {
-		s.intermediatePath = value
+		s.intermediateDir = value
 	} else if key == "output-path" {
-		s.outputPath = value
+		s.outputDir = value
 	}
 }
 

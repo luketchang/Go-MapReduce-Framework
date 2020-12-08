@@ -8,7 +8,7 @@ import (
 
 func TestStageFiles(t *testing.T) {
 	s := Server{}
-	s.inputPath = "test_files/input"
+	s.inputDir = "test_files/input"
 	s.stageInputFiles()
 
 	assert.Equal(t, s.unprocessed, []string{
@@ -19,7 +19,7 @@ func TestStageFiles(t *testing.T) {
 
 func TestGetNextFileValid(t *testing.T) {
 	s := Server{}
-	s.inputPath = "test_files/input"
+	s.inputDir = "test_files/input/"
 	s.stageInputFiles()
 
 	file := s.getNextFile()

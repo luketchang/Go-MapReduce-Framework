@@ -12,12 +12,12 @@ func main() {
 	}
 
 	executable := os.Args[1]
-	outputDir := os.Args[2]
+	intermediateDir := os.Args[2]
 
 	mapper := mapreduce.Mapper{
 		mapreduce.Worker{
 			Executable: executable,
-			OutputDir:  outputDir,
+			OutputDir:  intermediateDir,
 		},
 	}
 

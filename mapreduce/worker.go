@@ -42,8 +42,8 @@ func (w *Worker) AlertServerOfProgress(info string) {
 	w.sendJobAlert(conn, info)
 }
 
-func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) {
-	command := w.buildWorkerCommand(w.Executable, inputFilePath, outputFilePath)
+func (w *Worker) ProcessInput(inputFilePath string) {
+	command := w.buildWorkerCommand(w.Executable, inputFilePath, w.OutputDir)
 	err := command.Run()
 	if err != nil {
 		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})

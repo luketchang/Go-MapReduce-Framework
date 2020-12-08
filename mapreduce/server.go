@@ -27,9 +27,9 @@ type Server struct {
 	numReducers       int
 	mapper            string //mr executable
 	reducer           string //mrm executable
-	inputPath         string
-	intermediatePath  string
-	outputPath        string
+	inputDir          string
+	intermediateDir   string
+	outputDir         string
 	mapperExecutable  string //wordcount-mapper
 	reducerExecutable string //wordcount-reducer
 
@@ -126,18 +126,17 @@ func (s *Server) spawnMappers() {
 }
 
 func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
-	commandFlag := fmt.Sprintf("--command=%s %s %s", s.mapper, s.mapperExecutable, s.intermediatePath)
+	commandFlag := fmt.Sprintf("--command=%s %s %s", s.mapper, s.mapperExecutable, s.intermediateDir)
 	zoneFlag := fmt.Sprintf("--zone=%s", ServerZone)
 	command := exec.Command("gcloud", "compute", "ssh", remoteMachine, zoneFlag, commandFlag)
 	return command
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
-	err := command.Start()
+	err := command.Run()
 	if err != nil {
 		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
 	}
-	err = command.Wait()
 	log.Println("Command finished with error:", err)
 	wg.Done()
 }
