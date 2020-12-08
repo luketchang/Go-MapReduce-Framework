@@ -3,6 +3,7 @@ package mapreduce
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 )
 
 type Mapper struct {
@@ -19,6 +20,16 @@ func (m *Mapper) StartMappingFiles() {
 		}
 
 		m.AlertServerOfProgress("About to map \"" + inputFilePath + "\".")
-		m.ProcessInput(inputFilePath)
+		intermediateFilePath := getIntermediateFilePath(inputFilePath, m.OutputDir)
+		m.ProcessInput(inputFilePath, intermediateFilePath)
 	}
+}
+
+func getIntermediateFilePath(inputPath string, intermediateDir string) string {
+	inputFileName := filepath.Base(inputPath)
+	intermediateFileName := ChangeExtension(inputFileName, "mapped")
+	return intermediateDir + intermediateFileName
+}
+
+func (m *Mapper) sortMappedFiles() {
 }

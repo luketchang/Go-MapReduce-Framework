@@ -4,10 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
-
-	"github.com/mapreduce/mapreduce"
 )
 
 const (
@@ -20,19 +17,19 @@ func main() {
 		return
 	}
 
-	inputPath := os.Args[1]
-	intermediateDir := os.Args[2]
-	parseFile(inputPath, intermediateDir)
+	inputFilePath := os.Args[1]
+	outputFilePath := os.Args[2]
+
+	parseFile(inputFilePath, outputFilePath)
 }
 
-func parseFile(inputPath string, intermediateDir string) {
-	inputFile, err := os.Open(inputPath)
+func parseFile(inputFilePath string, outputFilePath string) {
+	inputFile, err := os.Open(inputFilePath)
 	if err != nil {
 		os.Exit(FailedToOpenCode)
 	}
 	defer inputFile.Close()
 
-	outputFilePath := getIntermediateFilePath(inputPath, intermediateDir)
 	outputFile, err := os.OpenFile(outputFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		os.Exit(FailedToOpenCode)
@@ -51,10 +48,4 @@ func parseFile(inputPath string, intermediateDir string) {
 
 func getOutputPair(word string) string {
 	return word + " 1"
-}
-
-func getIntermediateFilePath(inputPath string, intermediateDir string) string {
-	inputFileName := filepath.Base(inputPath)
-	intermediateFileName := mapreduce.ChangeExtension(inputFileName, "mapped")
-	return intermediateDir + intermediateFileName
 }
