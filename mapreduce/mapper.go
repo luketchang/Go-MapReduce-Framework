@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -80,5 +79,6 @@ func (m *Mapper) getHashValue(word string) int {
 }
 
 func (m *Mapper) getBucketedFilePath(mappedFilePath string, hashVal int) string {
-	return mappedFilePath + "." + strconv.FormatInt(int64(hashVal), 10)
+	paddedHashNum := GetPaddedNumber(hashVal)
+	return ChangeExtension(mappedFilePath, paddedHashNum+"."+"mapped")
 }

@@ -5,6 +5,16 @@ type MapReduceError struct {
 	err    string
 }
 
+const (
+	WrongNumArgs    int = 2
+	InvalidArgsType int = 3
+)
+
+var ErrorCodeToStringMap = map[int]string{
+	WrongNumArgs:    "Invalid number of arguments.",
+	InvalidArgsType: "Invalid argument(s) type.",
+}
+
 var (
 	errStartingServer  = "failed to start server,"
 	errCouldNotConnect = "failed to establish client-server connection,"
