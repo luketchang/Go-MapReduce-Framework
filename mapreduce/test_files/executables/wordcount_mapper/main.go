@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/mapreduce/mapreduce"
 )
@@ -15,7 +14,6 @@ const (
 )
 
 func main() {
-	time.Sleep(2 * time.Second) //alternate machines
 	if len(os.Args[1:]) != 2 {
 		return
 	}

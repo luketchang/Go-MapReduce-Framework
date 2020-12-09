@@ -126,7 +126,7 @@ func (s *Server) spawnMappers() {
 }
 
 func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
-	commandFlag := fmt.Sprintf("--command=%s %s %s", s.mapper, s.mapperExecutable, s.intermediateDir)
+	commandFlag := fmt.Sprintf("--command=sudo %s %s %s", s.mapper, s.mapperExecutable, s.intermediateDir)
 	zoneFlag := fmt.Sprintf("--zone=%s", ServerZone)
 	command := exec.Command("gcloud", "compute", "ssh", remoteMachine, zoneFlag, commandFlag)
 	return command
