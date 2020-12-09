@@ -14,6 +14,7 @@ import (
 
 type Mapper struct {
 	Worker
+	NumHashCodes int
 }
 
 func (m *Mapper) StartMappingFiles() {
@@ -75,7 +76,7 @@ func (m *Mapper) getHashValue(word string) int {
 		hash = hash * -1
 	}
 
-	return hash % 4
+	return hash % m.NumHashCodes
 }
 
 func (m *Mapper) getBucketedFilePath(mappedFilePath string, hashVal int) string {
