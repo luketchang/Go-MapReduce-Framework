@@ -49,7 +49,7 @@ func (s *Server) applyConfigLineToServer(key string, value string) {
 	} else if key == "input-path" {
 		s.inputDir = value
 		if string(value[len(value)-1]) != "/" {
-			s.inputDir = s.intermediateDir + "/"
+			s.inputDir = s.inputDir + "/"
 		}
 	} else if key == "intermediate-path" {
 		s.intermediateDir = value
@@ -59,7 +59,7 @@ func (s *Server) applyConfigLineToServer(key string, value string) {
 	} else if key == "output-path" {
 		s.outputDir = value
 		if string(value[len(value)-1]) != "/" {
-			s.outputDir = s.intermediateDir + "/"
+			s.outputDir = s.outputDir + "/"
 		}
 	}
 }

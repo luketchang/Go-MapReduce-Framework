@@ -64,7 +64,7 @@ func NewServer(args []string) *Server {
 func (s *Server) Run() {
 	s.spawnMappers()
 	if !s.mapOnly {
-		s.spawnReducers()
+		// s.spawnReducers()
 	}
 }
 
@@ -152,7 +152,10 @@ func (s *Server) spawnReducers() {
 	var wg sync.WaitGroup
 	wg.Add(s.numReducers)
 	for i := 0; i < s.numReducers; i++ {
-		// reducerNode := s.getRandomNode()
+		reducerNode := s.getRandomNode()
+		command := s.buildReducerCommand(reducerNode)
+		log.Println("Starting command [", command, "] on remote command on machine:", reducerNode)
+		go s.spawnWorker(command, &wg)
 	}
 }
 
@@ -162,6 +165,13 @@ func (s *Server) fillUnprocessedWithIntermediates() {
 		filePattern := s.intermediateDir + "*." + GetPaddedNumber(i) + ".mapped"
 		s.unprocessed = append(s.unprocessed, filePattern)
 	}
+}
+
+func (s *Server) buildReducerCommand(remoteMachine string) *exec.Cmd {
+	commandFlag := fmt.Sprintf("--command=sudo %s %s %s", s.reducer, s.reducerExecutable, s.outputDir)
+	zoneFlag := fmt.Sprintf("--zone=%s", ServerZone)
+	command := exec.Command("gcloud", "compute", "ssh", remoteMachine, zoneFlag, commandFlag)
+	return command
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {

@@ -26,7 +26,7 @@ func TestParseConfigCorrectCase(t *testing.T) {
 	assert.EqualValues(t, 1, server.numMappers)
 	assert.EqualValues(t, 1, server.numReducers)
 
-	assert.EqualValues(t, "test_files/input", server.inputDir)
-	assert.EqualValues(t, "test_files/intermediate", server.intermediateDir)
-	assert.EqualValues(t, "test_files/output", server.outputDir)
+	assert.EqualValues(t, "test_files/input/", server.inputDir)
+	assert.EqualValues(t, "test_files/intermediate/", server.intermediateDir)
+	assert.EqualValues(t, "test_files/output/", server.outputDir)
 }
