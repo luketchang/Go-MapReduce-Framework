@@ -134,11 +134,12 @@ func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
-	err := command.Run()
+	err := command.Start()
 	if err != nil {
 		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
 	}
-	log.Println("Command finished with error:", err)
+	err = command.Wait()
+	log.Println("Worker command exited with status:", err)
 	wg.Done()
 }
 

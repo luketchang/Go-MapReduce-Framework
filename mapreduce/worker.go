@@ -44,11 +44,12 @@ func (w *Worker) AlertServerOfProgress(info string) {
 
 func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) {
 	command := w.buildWorkerCommand(w.Executable, inputFilePath, outputFilePath)
-	err := command.Run()
+	err := command.Start()
 	if err != nil {
 		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
 	}
-	log.Println("Command finished with error:", err)
+	err = command.Wait()
+	log.Println("Process input command exited with status:", err)
 }
 
 func (w *Worker) buildWorkerCommand(executable string, inputFilePath string, outputFilePath string) *exec.Cmd {
