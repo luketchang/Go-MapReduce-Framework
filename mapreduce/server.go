@@ -39,7 +39,6 @@ type Server struct {
 
 	unprocessed []string
 	inflight    map[string]bool
-	fileLock    sync.Mutex
 }
 
 func NewServer(args []string) *Server {
@@ -101,9 +100,8 @@ func (s *Server) handleRequest(conn net.Conn) {
 
 	log.Println("Received worker message: ", msgString)
 	if msg == WorkerReady {
-		s.fileLock.Lock()
 		path := s.getUnprocessedFilePattern() //*hidden side-effect*
-		s.fileLock.Unlock()
+
 		if !isEmpty(path) {
 			s.sendJobStart(conn, path)
 		} else {
