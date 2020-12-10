@@ -14,6 +14,7 @@ func TestRequestInputWorkerReady(t *testing.T) {
 		"test_files/input/00001.input",
 		"test_files/input/00002.input",
 		"test_files/input/00003.input"}
+	s.inflight = make(map[string]bool)
 	s.startServer()
 
 	conn, err := net.Dial("tcp", "127.0.0.1:8001")
@@ -25,7 +26,7 @@ func TestRequestInputWorkerReady(t *testing.T) {
 	w := Worker{}
 	w.sendWorkerReady(conn)
 	serverMsg := readFromConn(conn)
-	assert.EqualValues(t, s.inflight[0], serverMsg)
+	assert.EqualValues(t, s.inflight[serverMsg], true)
 }
 
 func TestRequestInputNoMoreFiles(t *testing.T) {
@@ -33,8 +34,6 @@ func TestRequestInputNoMoreFiles(t *testing.T) {
 	s.address = ":8002"
 	s.unprocessed = []string{}
 	s.startServer()
-
-	s.unprocessed = []string{}
 
 	conn, err := net.Dial("tcp", "127.0.0.1:8002")
 	if err != nil {

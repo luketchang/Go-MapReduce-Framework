@@ -20,10 +20,11 @@ func TestStageFiles(t *testing.T) {
 func TestGetNextFileValid(t *testing.T) {
 	s := Server{}
 	s.inputDir = "test_files/input/"
+	s.inflight = make(map[string]bool)
 	s.stageInputFiles()
 
-	file := s.getNextFile()
+	file := s.getUnprocessedFilePattern()
 	assert.Equal(t, file, "test_files/input/00001.input")
-	assert.Equal(t, s.inflight[0], "test_files/input/00001.input")
+	assert.Equal(t, s.inflight["test_files/input/00001.input"], true)
 	assert.Equal(t, s.unprocessed[0], "test_files/input/00002.input")
 }

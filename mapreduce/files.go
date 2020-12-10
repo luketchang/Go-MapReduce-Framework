@@ -29,20 +29,24 @@ func (s *Server) stageInputFiles() {
 	}
 }
 
-func (s *Server) getNextFile() string {
+func (s *Server) getUnprocessedFilePattern() string {
 	if len(s.unprocessed) == 0 {
 		return ""
 	}
 
-	path := s.popFirstFile()
-	s.inflight = append(s.inflight, path)
+	path := s.popUnprocessedList()
+	s.inflight[path] = true
 	return path
 }
 
-func (s *Server) popFirstFile() string {
+func (s *Server) popUnprocessedList() string {
 	path := s.unprocessed[0]
 	s.unprocessed = s.unprocessed[1:]
 	return path
+}
+
+func (s *Server) markFilePatternAsProcessed(filePattern string) {
+	delete(s.inflight, filePattern)
 }
 
 func isEmpty(path string) bool {
