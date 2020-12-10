@@ -46,11 +46,8 @@ func extractMessageFromString(msgString string) Message {
 }
 
 func extractValueFromString(msgString string) string {
-	keyValPair := strings.Split(msgString, " ")
-	if len(keyValPair) != 2 {
-		log.Fatal(MapReduceError{errReadingMessage, "Invalid message key/val pair."})
-	}
-	return keyValPair[1]
+	valueIndex := strings.Index(msgString, " ")
+	return msgString[valueIndex+1:]
 }
 
 func readFromConn(conn net.Conn) string {

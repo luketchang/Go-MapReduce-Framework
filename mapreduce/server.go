@@ -51,9 +51,11 @@ func NewServer(args []string) *Server {
 	s.inflight = make(map[string]bool)
 	s.address = ":8000"
 
+	s.getNodes()
+	s.buildIPAddrMap()
+
 	s.parseArgumentList(args)
 	s.stageInputFiles()
-	s.nodes = s.getNodes()
 	s.startServer()
 
 	return &s
@@ -89,20 +91,21 @@ func (s *Server) orchestrateWorkers() {
 		if !s.serverIsRunning {
 			s.listener.Close()
 		}
-		log.Println("Received connection request from: ", conn.RemoteAddr())
-		s.handleRequest(conn)
+		fmt.Print("\n")
+
+		remoteIPAddr := getIPAddrFromConn(conn)
+		log.Println("Received connection request from: ", s.ipAddressMap[remoteIPAddr])
+		s.handleRequest(conn, remoteIPAddr)
 	}
 }
 
-func (s *Server) handleRequest(conn net.Conn) {
-	workerIPAddr := conn.RemoteAddr().String()
+func (s *Server) handleRequest(conn net.Conn, remoteIPAddr string) {
 	msgString := readFromConn(conn)
 	msg := extractMessageFromString(msgString)
+	log.Println("Received worker message: ", msg)
 
-	log.Println("Received worker message: ", msgString)
 	if msg == WorkerReady {
 		path := s.getUnprocessedFilePattern() //*hidden side-effect*
-
 		if !isEmpty(path) {
 			s.sendJobStart(conn, path)
 		} else {
@@ -110,10 +113,15 @@ func (s *Server) handleRequest(conn net.Conn) {
 		}
 	} else if msg == JobSucceeded {
 		filePattern := extractValueFromString(msgString)
-		s.markFilePatternAsProcessed(workerIPAddr, filePattern)
+		s.markFilePatternAsProcessed(remoteIPAddr, filePattern)
 	} else if msg == JobFailed {
 		filePattern := extractValueFromString(msgString)
-		s.rescheduleFilePatternJob(workerIPAddr, filePattern)
+		s.rescheduleFilePatternJob(remoteIPAddr, filePattern)
+	} else if msg == JobInfo {
+		info := extractValueFromString(msgString)
+		log.Println("Received job info:", info)
+	} else {
+		log.Println("Ignoring unrecognized message:", msgString)
 	}
 }
 

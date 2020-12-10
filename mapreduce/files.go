@@ -45,15 +45,15 @@ func (s *Server) popUnprocessedList() string {
 	return path
 }
 
-func (s *Server) markFilePatternAsProcessed(workerIPAddr string, filePattern string) {
+func (s *Server) markFilePatternAsProcessed(remoteIPAddr string, filePattern string) {
 	delete(s.inflight, filePattern)
-	log.Println(filePattern + " successfully processed by " + workerIPAddr)
+	log.Println(filePattern + " successfully processed by " + s.ipAddressMap[remoteIPAddr])
 }
 
-func (s *Server) rescheduleFilePatternJob(workerIPAddr string, filePattern string) {
+func (s *Server) rescheduleFilePatternJob(remoteIPAddr string, filePattern string) {
 	s.unprocessed = append(s.unprocessed, filePattern)
 	delete(s.inflight, filePattern)
-	log.Println(filePattern + "failed to be processed by " + workerIPAddr + ". rescheduling...")
+	log.Println(filePattern + "failed to be processed by " + s.ipAddressMap[remoteIPAddr] + ". rescheduling...")
 }
 
 func isEmpty(path string) bool {
