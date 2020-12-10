@@ -95,6 +95,7 @@ func (s *Server) orchestrateWorkers() {
 }
 
 func (s *Server) handleRequest(conn net.Conn) {
+	workerIPAddr := conn.RemoteAddr().String()
 	msgString := readFromConn(conn)
 	msg := extractMessageFromString(msgString)
 
@@ -109,7 +110,10 @@ func (s *Server) handleRequest(conn net.Conn) {
 		}
 	} else if msg == JobSucceeded {
 		filePattern := extractValueFromString(msgString)
-		s.markFilePatternAsProcessed(filePattern)
+		s.markFilePatternAsProcessed(workerIPAddr, filePattern)
+	} else if msg == JobFailed {
+		filePattern := extractValueFromString(msgString)
+		s.rescheduleFilePatternJob(workerIPAddr, filePattern)
 	}
 }
 

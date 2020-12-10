@@ -45,8 +45,15 @@ func (s *Server) popUnprocessedList() string {
 	return path
 }
 
-func (s *Server) markFilePatternAsProcessed(filePattern string) {
+func (s *Server) markFilePatternAsProcessed(workerIPAddr string, filePattern string) {
 	delete(s.inflight, filePattern)
+	log.Println(filePattern + " successfully processed by " + workerIPAddr)
+}
+
+func (s *Server) rescheduleFilePatternJob(workerIPAddr string, filePattern string) {
+	s.unprocessed = append(s.unprocessed, filePattern)
+	delete(s.inflight, filePattern)
+	log.Println(filePattern + "failed to be processed by " + workerIPAddr + ". rescheduling...")
 }
 
 func isEmpty(path string) bool {
