@@ -39,17 +39,26 @@ func isServerDoneMsg(serverResponse string) bool {
 
 func (w *Worker) AlertServerOfProgress(info string) {
 	conn := w.establishConnection()
-	w.sendJobAlert(conn, info)
+	w.sendJobProgressAlert(conn, info)
 }
 
-func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) {
+func (w *Worker) NotifyServerOfJobStatus(fileName string, err error) {
+	conn := w.establishConnection()
+	if err == nil {
+		w.sendJobSucceeded(conn, fileName)
+	} else {
+		w.sendJobFailed(conn, fileName)
+	}
+}
+
+func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) error {
 	command := w.buildWorkerCommand(w.Executable, inputFilePath, outputFilePath)
 	err := command.Start()
 	if err != nil {
 		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
 	}
 	err = command.Wait()
-	log.Println("Process input command exited with status:", err)
+	return err
 }
 
 func (w *Worker) buildWorkerCommand(executable string, inputFilePath string, outputFilePath string) *exec.Cmd {

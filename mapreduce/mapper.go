@@ -27,8 +27,11 @@ func (m *Mapper) StartMappingFiles() {
 
 		m.AlertServerOfProgress("About to map \"" + inputFilePath + "\".")
 		intermediateFilePath := m.getIntermediateFilePath(inputFilePath, m.OutputDir)
-		m.ProcessInput(inputFilePath, intermediateFilePath)
+		err := m.ProcessInput(inputFilePath, intermediateFilePath)
 		m.sortMappedFile(intermediateFilePath)
+
+		os.Remove(intermediateFilePath)
+		m.NotifyServerOfJobStatus(inputFilePath, err)
 	}
 }
 
@@ -44,7 +47,6 @@ func (m *Mapper) sortMappedFile(mappedFilePath string) {
 		log.Fatal(MapReduceError{errOpeningFile, err.Error()})
 	}
 	defer mappedFile.Close()
-	defer os.Remove(mappedFilePath)
 
 	scanner := bufio.NewScanner(mappedFile)
 	scanner.Split(bufio.ScanLines)

@@ -37,12 +37,20 @@ var messageToStringMap = map[Message]string{
 }
 
 func extractMessageFromString(msgString string) Message {
-	firstWord := strings.Split(msgString, " ")[0]
-	msg, exists := stringToMessageMap[firstWord]
+	key := strings.Split(msgString, " ")[0]
+	msg, exists := stringToMessageMap[key]
 	if !exists {
 		return UnknownMessage
 	}
 	return msg
+}
+
+func extractValueFromString(msgString string) string {
+	keyValPair := strings.Split(msgString, " ")
+	if len(keyValPair) != 2 {
+		log.Fatal(MapReduceError{errReadingMessage, "Invalid message key/val pair."})
+	}
+	return keyValPair[1]
 }
 
 func readFromConn(conn net.Conn) string {
@@ -59,7 +67,6 @@ func (s *Server) sendJobStart(conn net.Conn, path string) {
 	if err != nil {
 		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
 	}
-	log.Println("Sent message to worker: ", path)
 }
 
 func (s *Server) sendServerDone(conn net.Conn) {
@@ -76,8 +83,22 @@ func (w *Worker) sendWorkerReady(conn net.Conn) {
 	}
 }
 
-func (w *Worker) sendJobAlert(conn net.Conn, info string) {
+func (w *Worker) sendJobProgressAlert(conn net.Conn, info string) {
 	_, err := conn.Write([]byte(messageToStringMap[JobInfo] + " " + info))
+	if err != nil {
+		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+	}
+}
+
+func (w *Worker) sendJobSucceeded(conn net.Conn, fileName string) {
+	_, err := conn.Write([]byte(messageToStringMap[JobSucceeded] + " " + fileName))
+	if err != nil {
+		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+	}
+}
+
+func (w *Worker) sendJobFailed(conn net.Conn, fileName string) {
+	_, err := conn.Write([]byte(messageToStringMap[JobFailed] + " " + fileName))
 	if err != nil {
 		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
 	}

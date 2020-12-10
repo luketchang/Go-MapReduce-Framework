@@ -101,14 +101,15 @@ func (s *Server) handleRequest(conn net.Conn) {
 	log.Println("Received worker message: ", msgString)
 	if msg == WorkerReady {
 		s.fileLock.Lock()
-		path := s.getNextFile()
+		path := s.getNextFile() //*hidden side-effect*
 		s.fileLock.Unlock()
 		if !isEmpty(path) {
 			s.sendJobStart(conn, path)
 		} else {
 			s.sendServerDone(conn)
 		}
-		//TODO: add other message cases after worker code
+	} else if msg == JobSucceeded {
+		// val := extractValueFromString(msgString)
 	}
 }
 
@@ -133,6 +134,19 @@ func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
 	return command
 }
 
+func (s *Server) spawnReducers() {
+	var wg sync.WaitGroup
+	wg.Add(s.numReducers)
+	for i := 0; i < s.numReducers; i++ {
+		// reducerNode := s.getRandomNode()
+	}
+}
+
+func (s *Server) refillUnprocessedList() {
+	s.unprocessed = nil
+
+}
+
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
 	err := command.Start()
 	if err != nil {
@@ -142,8 +156,6 @@ func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
 	log.Println("Worker command exited with status:", err)
 	wg.Done()
 }
-
-func (s *Server) spawnReducers() {}
 
 func (s *Server) shutDown() {
 	s.serverIsRunning = false
