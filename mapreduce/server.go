@@ -147,6 +147,8 @@ func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
 }
 
 func (s *Server) spawnReducers() {
+	s.fillUnprocessedWithIntermediates()
+
 	var wg sync.WaitGroup
 	wg.Add(s.numReducers)
 	for i := 0; i < s.numReducers; i++ {
@@ -154,9 +156,12 @@ func (s *Server) spawnReducers() {
 	}
 }
 
-func (s *Server) refillUnprocessedList() {
+func (s *Server) fillUnprocessedWithIntermediates() {
 	s.unprocessed = nil
-
+	for i := 0; i < s.numMappers*s.numReducers; i++ {
+		filePattern := s.intermediateDir + "*." + GetPaddedNumber(i) + ".mapped"
+		s.unprocessed = append(s.unprocessed, filePattern)
+	}
 }
 
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
