@@ -11,12 +11,12 @@
   - Repeatedly requests input from server
   - Runs user-supplied custom mapper script on received input file
   - Buckets key-value pairs of mapped file into separate files based on key's hash-value (in shared_files/intermediate)
-  - Notifies of server of progress and final job status for each input
+  - Notifies server of progress and final job status for each input
 - **Reducers**:
-  - Repeatedly requests input from server
-  - Runs sort and 'group-by-key' script on received input files
+  - Repeatedly requests intermediate files from server
+  - Runs sort and 'group-by-key' script on received intermediat files
   - Runs user-supplied custom reducer script on sorted/grouped file (reduced files output to shared_files/output)
-  - Notifies of server of progress and final job status for each input
+  - Notifies server of progress and final job status for each input
   
 ### Design Questions/Decisions
 - Combined mapping and hash-bucketing steps under mapper but could have had 3 separate entities (mapper, bucketer, and reducer) to better adhere to Single Responsibility Principle
