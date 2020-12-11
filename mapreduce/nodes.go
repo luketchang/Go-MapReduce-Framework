@@ -10,15 +10,15 @@ import (
 
 func (s *Server) buildIPAddrMap() {
 	s.ipAddressMap = map[string]string{
-		"35.236.94.23":  "machine-1",
-		"34.94.186.201": "machine-2",
+		"35.236.81.4": "machine-1",
+		"35.235.78.8": "machine-2",
 	}
 }
 
 func (s *Server) getNodes() {
 	s.nodes = []string{
-		"mapper-1",
-		"mapper-2",
+		"machine-1",
+		"machine-2",
 	}
 }
 
