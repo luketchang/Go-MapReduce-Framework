@@ -135,7 +135,7 @@ func (s *Server) spawnMappers() {
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
-	log.Println("Mappers done.")
+	fmt.Println("\n___________________Mappers_Finished___________________\n\n")
 }
 
 func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
@@ -158,7 +158,7 @@ func (s *Server) spawnReducers() {
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
-	log.Println("Reducers done.")
+	log.Println(fmt.Println("\n___________________Reducers_Finished___________________\n\n"))
 }
 
 func (s *Server) fillUnprocessedWithIntermediates() {
