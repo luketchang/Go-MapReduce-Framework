@@ -1,6 +1,7 @@
 package mapreduce
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"path/filepath"
@@ -17,7 +18,7 @@ func (r *Reducer) StartReducingFiles() {
 			break
 		}
 
-		initialOutputPattern := r.getOutputFilePattern(intermediatePattern, r.OutputDir)
+		initialOutputPattern := r.getInitialOutputPattern(intermediatePattern, r.OutputDir)
 		r.createInitialSortedOutputFile(intermediatePattern, initialOutputPattern)
 
 		r.AlertServerOfProgress("About to reduce \"" + intermediatePattern + "\".")
@@ -25,7 +26,7 @@ func (r *Reducer) StartReducingFiles() {
 	}
 }
 
-func (r *Reducer) getOutputFilePattern(intermediatePattern string, outputDir string) string {
+func (r *Reducer) getInitialOutputPattern(intermediatePattern string, outputDir string) string {
 	intermediateFilePattern := filepath.Base(intermediatePattern)
 	outputFileName := ChangeExtension(intermediateFilePattern, "out")
 	return outputDir + outputFileName
@@ -42,9 +43,9 @@ func (r *Reducer) createInitialSortedOutputFile(intermediatePattern string, init
 }
 
 func (r *Reducer) buildSortInitialOutputCommand(intermediatePattern string, initialOutputPattern string) *exec.Cmd {
-	return exec.Command(
-		"cat", intermediatePattern,
-		"|", "sort",
-		"|", "python3", "./mapreduce/group-by-key.py",
-		">", initialOutputPattern)
+	commandOpt := fmt.Sprintf(
+		"cat %s | sort | python ./mapreduce/group-by-key.py > %s",
+		intermediatePattern,
+		initialOutputPattern)
+	return exec.Command("sudo", "bash", "-c", commandOpt)
 }

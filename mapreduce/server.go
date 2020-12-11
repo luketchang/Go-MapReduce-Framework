@@ -62,10 +62,11 @@ func NewServer(args []string) *Server {
 }
 
 func (s *Server) Run() {
-	s.spawnMappers()
-	if !s.mapOnly {
-		// s.spawnReducers()
-	}
+	// s.spawnMappers()
+	// if !s.mapOnly {
+	// 	s.spawnReducers()
+	// }
+	s.spawnReducers()
 }
 
 func (s *Server) startServer() {
