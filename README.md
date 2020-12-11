@@ -23,6 +23,10 @@
 - Additionally, if bucketers were separate entities that ran concurrently with mappers, higher performance could be achieved with bucketers performing job as soon as new mapped file is available
 - Used Google Filestore for shared storage across VMs but basic Filestore I/O ended up being extremely slow (would likely switch to different alternative or have workers send locally processed files back to server instead of having shared storage)
 
+### Server Logs
+<img src="https://raw.githubusercontent.com/ltchang2019/Go-MapReduce-Framework/master/log_images/mappers.png" width="500" height="400" />
+<img src="https://raw.githubusercontent.com/ltchang2019/Go-MapReduce-Framework/master/log_images/reducers.png" width="500" height="400" />
+
 ### Todo
 - *Add automated tests for verifying consistency of outputs of remote commands
 - Add thorough error checking in argument and config parsers
