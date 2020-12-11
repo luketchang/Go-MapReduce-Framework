@@ -66,6 +66,7 @@ func (s *Server) Run() {
 	if !s.mapOnly {
 		s.spawnReducers()
 	}
+	s.shutDown()
 }
 
 func (s *Server) startServer() {
