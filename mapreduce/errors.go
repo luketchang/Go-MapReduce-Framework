@@ -2,7 +2,11 @@ package mapreduce
 
 type MapReduceError struct {
 	reason string
-	err    string
+	err    error
+}
+
+func (e *MapReduceError) Error() string {
+	return e.reason + ", " + e.err.Error()
 }
 
 const (

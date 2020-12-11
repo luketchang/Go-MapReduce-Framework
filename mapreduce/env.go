@@ -14,7 +14,7 @@ const (
 func GetHost() string {
 	name, err := os.Hostname()
 	if err != nil {
-		log.Fatal(MapReduceError{errEnvConfig, err.Error()})
+		log.Fatal(MapReduceError{errEnvConfig, err})
 	}
 	return name
 }
@@ -22,7 +22,7 @@ func GetHost() string {
 func GetCwd() string {
 	path, err := os.Getwd()
 	if err != nil {
-		log.Fatal(MapReduceError{errEnvConfig, err.Error()})
+		log.Fatal(MapReduceError{errEnvConfig, err})
 	}
 	return path
 }

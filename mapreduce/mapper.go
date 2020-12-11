@@ -44,7 +44,7 @@ func (m *Mapper) getIntermediateFilePath(inputPath string, intermediateDir strin
 func (m *Mapper) bucketMappedFile(mappedFilePath string) {
 	mappedFile, err := os.Open(mappedFilePath)
 	if err != nil {
-		log.Fatal(MapReduceError{errOpeningFile, err.Error()})
+		log.Fatal(MapReduceError{errOpeningFile, err})
 	}
 	defer mappedFile.Close()
 
@@ -57,7 +57,7 @@ func (m *Mapper) bucketMappedFile(mappedFilePath string) {
 		outputFileName := m.getBucketedFilePath(mappedFilePath, hashVal)
 		outputFile, err := os.OpenFile(outputFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			log.Fatal(MapReduceError{errOpeningFile, err.Error()})
+			log.Fatal(MapReduceError{errOpeningFile, err})
 		}
 
 		fmt.Fprintln(outputFile, line)

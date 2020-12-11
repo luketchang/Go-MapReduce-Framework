@@ -25,7 +25,7 @@ func (s *Server) stageInputFiles() {
 	})
 
 	if err != nil {
-		log.Fatal(MapReduceError{errReadingInputDir, err.Error()})
+		log.Fatal(MapReduceError{errReadingInputDir, err})
 	}
 }
 

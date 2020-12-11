@@ -71,7 +71,7 @@ func (s *Server) Run() {
 func (s *Server) startServer() {
 	ln, err := net.Listen("tcp", s.address)
 	if err != nil {
-		log.Fatal(MapReduceError{errStartingServer, err.Error()})
+		log.Fatal(MapReduceError{errStartingServer, err})
 	}
 
 	log.Println("Server listening on: ", ExternalServerAddress)
@@ -84,7 +84,7 @@ func (s *Server) orchestrateWorkers() {
 	for {
 		conn, err := s.listener.Accept()
 		if err != nil {
-			log.Fatal(MapReduceError{errCouldNotConnect, err.Error()})
+			log.Fatal(MapReduceError{errCouldNotConnect, err})
 		}
 		defer conn.Close()
 
@@ -179,7 +179,7 @@ func (s *Server) buildReducerCommand(remoteMachine string) *exec.Cmd {
 func (s *Server) spawnWorker(command *exec.Cmd, wg *sync.WaitGroup) {
 	err := command.Start()
 	if err != nil {
-		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
+		log.Fatal(MapReduceError{errExecutingCmd, err})
 	}
 	err = command.Wait()
 	log.Println("Worker command exited with status:", err)

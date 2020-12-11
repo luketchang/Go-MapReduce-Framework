@@ -2,6 +2,7 @@ package mapreduce
 
 import (
 	"bufio"
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 func (s *Server) initializeFromConfigFile(configFilePath string) {
 	file, err := os.Open(configFilePath)
 	if err != nil {
-		log.Fatal(MapReduceError{errOpeningFile, configFilePath})
+		log.Fatal(MapReduceError{errOpeningFile, err})
 	}
 	defer file.Close()
 
@@ -23,8 +24,8 @@ func (s *Server) parseConfigFile(file *os.File) {
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		key := strings.Split(line, " ")[0]
-		if !Contains(key, ConfigFileKeys) {
-			log.Fatal(MapReduceError{errBadConfigFile, "non-existent config key"})
+		if !Contains(key, ConfigFileKeys) { //unreadable
+			log.Fatal(MapReduceError{errBadConfigFile, errors.New("non-existent config key")})
 		}
 
 		value := strings.Split(line, " ")[1]
@@ -32,7 +33,7 @@ func (s *Server) parseConfigFile(file *os.File) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(MapReduceError{errScanningFile, err.Error()})
+		log.Fatal(MapReduceError{errScanningFile, err})
 	}
 }
 
@@ -67,7 +68,7 @@ func (s *Server) applyConfigLineToServer(key string, value string) {
 func parseInt(value string) int {
 	num, err := strconv.Atoi(value)
 	if err != nil {
-		log.Fatal(MapReduceError{errBadConfigFile, err.Error()})
+		log.Fatal(MapReduceError{errBadConfigFile, err})
 	}
 	return num
 }

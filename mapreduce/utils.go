@@ -1,9 +1,8 @@
 package mapreduce
 
 import (
-	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func Contains(str string, s []string) bool {
@@ -15,9 +14,16 @@ func Contains(str string, s []string) bool {
 	return false
 }
 
-func ClearDirContents(dirPath string) {
-	dir, _ := ioutil.ReadDir(dirPath)
-	for _, d := range dir {
-		os.RemoveAll(path.Join([]string{dirPath, d.Name()}...))
+func ClearDirContents(dirPath string) error {
+	files, err := filepath.Glob(filepath.Join(dirPath, "*"))
+	if err != nil {
+		return err
 	}
+	for _, file := range files {
+		err = os.RemoveAll(file)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

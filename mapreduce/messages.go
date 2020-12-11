@@ -54,7 +54,7 @@ func readFromConn(conn net.Conn) string {
 	buf := make([]byte, 1024)
 	strLen, err := conn.Read(buf)
 	if err != nil {
-		log.Fatal(MapReduceError{errReadingMessage, err.Error()})
+		log.Fatal(MapReduceError{errReadingMessage, err})
 	}
 	return string(buf[:strLen])
 }
@@ -62,41 +62,41 @@ func readFromConn(conn net.Conn) string {
 func (s *Server) sendJobStart(conn net.Conn, path string) {
 	_, err := conn.Write([]byte(path))
 	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+		log.Fatal(MapReduceError{errWritingMessage, err})
 	}
 }
 
 func (s *Server) sendServerDone(conn net.Conn) {
 	_, err := conn.Write([]byte(ServerDone))
 	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+		log.Fatal(MapReduceError{errWritingMessage, err})
 	}
 }
 
 func (w *Worker) sendWorkerReady(conn net.Conn) {
 	_, err := conn.Write([]byte(WorkerReady))
 	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+		log.Fatal(MapReduceError{errWritingMessage, err})
 	}
 }
 
 func (w *Worker) sendJobProgressAlert(conn net.Conn, info string) {
 	_, err := conn.Write([]byte(messageToStringMap[JobInfo] + " " + info))
 	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+		log.Fatal(MapReduceError{errWritingMessage, err})
 	}
 }
 
 func (w *Worker) sendJobSucceeded(conn net.Conn, fileName string) {
 	_, err := conn.Write([]byte(messageToStringMap[JobSucceeded] + " " + fileName))
 	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+		log.Fatal(MapReduceError{errWritingMessage, err})
 	}
 }
 
 func (w *Worker) sendJobFailed(conn net.Conn, fileName string) {
 	_, err := conn.Write([]byte(messageToStringMap[JobFailed] + " " + fileName))
 	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err.Error()})
+		log.Fatal(MapReduceError{errWritingMessage, err})
 	}
 }

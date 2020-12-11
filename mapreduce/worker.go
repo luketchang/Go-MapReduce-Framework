@@ -26,7 +26,7 @@ func (w *Worker) RequestInput() (string, bool) {
 func (w *Worker) establishConnection() net.Conn {
 	conn, err := net.Dial("tcp", ExternalServerAddress)
 	if err != nil {
-		log.Fatal(MapReduceError{errCouldNotConnect, err.Error()})
+		log.Fatal(MapReduceError{errCouldNotConnect, err})
 	}
 
 	log.Println("Worker connected to server!")
@@ -55,7 +55,7 @@ func (w *Worker) ProcessInput(inputFilePath string, outputFilePath string) error
 	command := w.buildWorkerCommand(w.Executable, inputFilePath, outputFilePath)
 	err := command.Start()
 	if err != nil {
-		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
+		log.Fatal(MapReduceError{errExecutingCmd, err})
 	}
 	err = command.Wait()
 	return err

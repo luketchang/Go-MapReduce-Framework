@@ -44,7 +44,7 @@ func (r *Reducer) createInitialSortedOutputFile(intermediatePattern string, init
 	command := r.buildSortInitialOutputCommand(intermediatePattern, initialOutputPattern)
 	err := command.Start()
 	if err != nil {
-		log.Fatal(MapReduceError{errExecutingCmd, err.Error()})
+		log.Fatal(MapReduceError{errExecutingCmd, err})
 	}
 	err = command.Wait()
 	log.Println("Sort command exited with status:", err)
