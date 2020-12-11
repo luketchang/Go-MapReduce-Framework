@@ -14,6 +14,8 @@ type Reducer struct {
 }
 
 func (r *Reducer) StartReducingFiles() {
+	ClearDirContents(r.OutputDir)
+
 	for {
 		intermediatePattern, serverDone := r.RequestInput()
 		if serverDone {

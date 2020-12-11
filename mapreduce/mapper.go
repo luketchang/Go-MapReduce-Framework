@@ -17,6 +17,8 @@ type Mapper struct {
 }
 
 func (m *Mapper) StartMappingFiles() {
+	ClearDirContents(m.OutputDir)
+
 	for {
 		inputFilePath, serverDone := m.RequestInput()
 		if serverDone {
