@@ -53,7 +53,7 @@ func (s *Server) markFilePatternAsProcessed(remoteIPAddr string, filePattern str
 func (s *Server) rescheduleFilePatternJob(remoteIPAddr string, filePattern string) {
 	s.unprocessed = append(s.unprocessed, filePattern)
 	delete(s.inflight, filePattern)
-	log.Println(filePattern + " failed to be processed by " + s.ipAddressMap[remoteIPAddr] + ". rescheduling...")
+	log.Println(filePattern + " failed to be processed by " + s.ipAddressMap[remoteIPAddr] + ". Rescheduling...")
 }
 
 func isEmpty(path string) bool {

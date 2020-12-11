@@ -132,7 +132,7 @@ func (s *Server) spawnMappers() {
 	for i := 0; i < s.numMappers; i++ {
 		mapperNode := s.getRandomNode()
 		command := s.buildMapperCommand(mapperNode)
-		log.Println("Starting command [", command, "] on remote command on machine:", mapperNode)
+		log.Println("Starting mapper command on remote machine:", mapperNode)
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
@@ -155,7 +155,7 @@ func (s *Server) spawnReducers() {
 	for i := 0; i < s.numReducers; i++ {
 		reducerNode := s.getRandomNode()
 		command := s.buildReducerCommand(reducerNode)
-		log.Println("Starting command [", command, "] on remote command on machine:", reducerNode)
+		log.Println("Starting reducer command on remote machine:", reducerNode)
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
