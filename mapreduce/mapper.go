@@ -18,9 +18,7 @@ type Mapper struct {
 
 func (m *Mapper) StartMappingFiles() {
 	for {
-		fmt.Println("Mapper worker started...")
 		inputFilePath, serverDone := m.RequestInput()
-		log.Println(inputFilePath, serverDone)
 		if serverDone {
 			break
 		}
@@ -28,7 +26,7 @@ func (m *Mapper) StartMappingFiles() {
 		m.AlertServerOfProgress("About to map \"" + inputFilePath + "\".")
 		intermediateFilePath := m.getIntermediateFilePath(inputFilePath, m.OutputDir)
 		err := m.ProcessInput(inputFilePath, intermediateFilePath)
-		m.sortMappedFile(intermediateFilePath)
+		m.bucketMappedFile(intermediateFilePath)
 
 		os.Remove(intermediateFilePath)
 		m.NotifyServerOfJobStatus(inputFilePath, err)
@@ -41,7 +39,7 @@ func (m *Mapper) getIntermediateFilePath(inputPath string, intermediateDir strin
 	return intermediateDir + intermediateFileName
 }
 
-func (m *Mapper) sortMappedFile(mappedFilePath string) {
+func (m *Mapper) bucketMappedFile(mappedFilePath string) {
 	mappedFile, err := os.Open(mappedFilePath)
 	if err != nil {
 		log.Fatal(MapReduceError{errOpeningFile, err.Error()})

@@ -157,6 +157,8 @@ func (s *Server) spawnReducers() {
 		log.Println("Starting command [", command, "] on remote command on machine:", reducerNode)
 		go s.spawnWorker(command, &wg)
 	}
+	wg.Wait()
+	log.Println("Reducers done.")
 }
 
 func (s *Server) fillUnprocessedWithIntermediates() {
