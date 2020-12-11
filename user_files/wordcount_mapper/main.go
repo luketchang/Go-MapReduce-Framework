@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 )
 
-const (
-	FailedToOpenCode int = 2
-)
+const FailedToOpenCode int = 2
+
+var isAlphaNumeric = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 
 func main() {
 	time.Sleep(2 * time.Second) //alternate machines
@@ -40,9 +42,11 @@ func parseFile(inputFilePath string, outputFilePath string) {
 	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {
 		word := scanner.Text()
-		pair := getOutputPair(word)
-
-		fmt.Fprintln(outputFile, pair)
+		if isAlphaNumeric(word) {
+			word = strings.ToLower(word)
+			pair := getOutputPair(word)
+			fmt.Fprintln(outputFile, pair)
+		}
 	}
 }
 
