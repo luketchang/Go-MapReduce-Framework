@@ -3,8 +3,10 @@ package mapreduce
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 type Reducer struct {
@@ -22,13 +24,17 @@ func (r *Reducer) StartReducingFiles() {
 		r.createInitialSortedOutputFile(intermediatePattern, initialOutputPattern)
 
 		r.AlertServerOfProgress("About to reduce \"" + intermediatePattern + "\".")
-		//TODO: call wordcount reducer executable
+		finalOutputPattern := strings.Replace(initialOutputPattern, "*.", "", 1)
+		err := r.ProcessInput(initialOutputPattern, finalOutputPattern)
+
+		os.Remove(initialOutputPattern)
+		r.NotifyServerOfJobStatus(intermediatePattern, err)
 	}
 }
 
 func (r *Reducer) getInitialOutputPattern(intermediatePattern string, outputDir string) string {
 	intermediateFilePattern := filepath.Base(intermediatePattern)
-	outputFileName := ChangeExtension(intermediateFilePattern, "out")
+	outputFileName := ChangeExtension(intermediateFilePattern, "output")
 	return outputDir + outputFileName
 }
 
