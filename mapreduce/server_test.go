@@ -23,8 +23,7 @@ func TestRequestInputWorkerReady(t *testing.T) {
 	}
 	defer conn.Close()
 
-	w := Worker{}
-	w.sendWorkerReady(conn)
+	sendMessage(conn, WorkerReady.toString(), "")
 	serverMsg := readFromConn(conn)
 	assert.EqualValues(t, s.inflight[serverMsg], true)
 }
@@ -41,8 +40,7 @@ func TestRequestInputNoMoreFiles(t *testing.T) {
 	}
 	defer conn.Close()
 
-	w := Worker{}
-	w.sendWorkerReady(conn)
+	sendMessage(conn, WorkerReady.toString(), "")
 	serverMsg := readFromConn(conn)
 	assert.EqualValues(t, serverMsg, ServerDone)
 }

@@ -108,9 +108,9 @@ func (s *Server) handleRequest(conn net.Conn, remoteIPAddr string) {
 	if msg == WorkerReady {
 		path := s.getUnprocessedFilePattern() //*hidden side-effect*
 		if !isEmpty(path) {
-			s.sendJobStart(conn, path)
+			sendMessage(conn, path, "")
 		} else {
-			s.sendServerDone(conn)
+			sendMessage(conn, ServerDone.toString(), "")
 		}
 	} else if msg == JobSucceeded {
 		filePattern := extractValueFromString(msgString)
@@ -136,7 +136,7 @@ func (s *Server) spawnMappers() {
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
-	fmt.Println("\n___________________Mappers_Finished___________________\n\n")
+	PrintStageMessage("MAPPERS FINISHED")
 }
 
 func (s *Server) buildMapperCommand(remoteMachine string) *exec.Cmd {
@@ -159,7 +159,7 @@ func (s *Server) spawnReducers() {
 		go s.spawnWorker(command, &wg)
 	}
 	wg.Wait()
-	log.Println(fmt.Println("\n___________________Reducers_Finished___________________\n\n"))
+	PrintStageMessage("REDUCERS FINISHED")
 }
 
 func (s *Server) fillUnprocessedWithIntermediates() {

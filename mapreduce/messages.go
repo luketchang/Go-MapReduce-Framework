@@ -36,6 +36,10 @@ var messageToStringMap = map[Message]string{
 	ServerDone:   "SERVER_DONE",
 }
 
+func (m Message) toString() string {
+	return messageToStringMap[m]
+}
+
 func extractMessageFromString(msgString string) Message {
 	key := strings.Split(msgString, " ")[0]
 	msg, exists := stringToMessageMap[key]
@@ -59,44 +63,16 @@ func readFromConn(conn net.Conn) string {
 	return string(buf[:strLen])
 }
 
-func (s *Server) sendJobStart(conn net.Conn, path string) {
-	_, err := conn.Write([]byte(path))
-	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err})
-	}
-}
-
-func (s *Server) sendServerDone(conn net.Conn) {
-	_, err := conn.Write([]byte(ServerDone))
-	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err})
-	}
-}
-
-func (w *Worker) sendWorkerReady(conn net.Conn) {
-	_, err := conn.Write([]byte(WorkerReady))
-	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err})
-	}
-}
-
-func (w *Worker) sendJobProgressAlert(conn net.Conn, info string) {
-	_, err := conn.Write([]byte(messageToStringMap[JobInfo] + " " + info))
-	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err})
-	}
-}
-
-func (w *Worker) sendJobSucceeded(conn net.Conn, fileName string) {
-	_, err := conn.Write([]byte(messageToStringMap[JobSucceeded] + " " + fileName))
-	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err})
-	}
-}
-
-func (w *Worker) sendJobFailed(conn net.Conn, fileName string) {
-	_, err := conn.Write([]byte(messageToStringMap[JobFailed] + " " + fileName))
-	if err != nil {
-		log.Fatal(MapReduceError{errWritingMessage, err})
+func sendMessage(conn net.Conn, key string, value string) {
+	if value == "" {
+		_, err := conn.Write([]byte(key))
+		if err != nil {
+			log.Fatal(MapReduceError{errWritingMessage, err})
+		}
+	} else {
+		_, err := conn.Write([]byte(key + " " + value))
+		if err != nil {
+			log.Fatal(MapReduceError{errWritingMessage, err})
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package mapreduce
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -26,4 +27,11 @@ func ClearDirContents(dirPath string) error {
 		}
 	}
 	return nil
+}
+
+func PrintStageMessage(message string) {
+	fmt.Println("")
+	fmt.Printf("___________________%s___________________", message)
+	fmt.Println("")
+	fmt.Println("")
 }

@@ -13,10 +13,11 @@ type Worker struct {
 
 func (w *Worker) RequestInput() (string, bool) {
 	conn := w.establishConnection()
-	w.sendWorkerReady(conn)
+	sendMessage(conn, WorkerReady.toString(), "")
 
 	serverResponse := readFromConn(conn)
-	if isServerDoneMsg(serverResponse) {
+	serverMsg := extractMessageFromString(serverResponse)
+	if serverMsg == ServerDone {
 		return "", true
 	}
 
@@ -39,15 +40,15 @@ func isServerDoneMsg(serverResponse string) bool {
 
 func (w *Worker) AlertServerOfProgress(info string) {
 	conn := w.establishConnection()
-	w.sendJobProgressAlert(conn, info)
+	sendMessage(conn, JobInfo.toString(), info)
 }
 
 func (w *Worker) NotifyServerOfJobStatus(fileName string, err error) {
 	conn := w.establishConnection()
 	if err == nil {
-		w.sendJobSucceeded(conn, fileName)
+		sendMessage(conn, JobSucceeded.toString(), fileName)
 	} else {
-		w.sendJobFailed(conn, fileName)
+		sendMessage(conn, JobFailed.toString(), fileName)
 	}
 }
 
